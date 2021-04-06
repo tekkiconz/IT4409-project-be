@@ -1,14 +1,23 @@
 const requestHandler = (req,res)=>{
     const url = req.url;
     const method = req.method;
-
-    if(url === `/`){
+    if(url === `/register`){
+        
+    }
+    if(url === `/login`){
+        
+    }
+    if(url === `/` && method === 'GET' ){
+        //Handle api
     }
     if(url === `/users`){
+        //Handle api
     }
     if(url === `/files`){
+        //Handle api
     }
     if(url === `/admin`){
+        //Handle api
     }
     res.statusCode = 200;
     res.write(`HelloWorld!`);
@@ -16,3 +25,5 @@ const requestHandler = (req,res)=>{
 }
 
 module.exports = requestHandler;
+
+app.get('/')
