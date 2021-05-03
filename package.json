@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/tekkiconz/be#readme",
   "dependencies": {
-    "mongoose": "^5.12.3",
+    "mongoose": "^5.12.7",
     "nodemon": "^2.0.7"
   }
 }

@@ -2,16 +2,17 @@ const http      = require('http');
 var MongoClient = require('mongodb').MongoClient;
 const mongoose  = require('mongoose');
 const BookModel = require('../models/book-model');
-const dbRoute   = require('../app-routes/db-route');
+const dbRoute   = require('../app-routes/routes');
 
 
 // Connect database
-const CONNECTION_STRING = 'mongodb://localhost:27017/bookshare-account';
+const CONNECTION_STRING = 'mongodb://localhost:27017/bookshare-accounnt';
 
 mongoose.connect(CONNECTION_STRING, 
 {
     useNewUrlParser: true, 
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useCreateIndex: true
 });
 
 var db = mongoose.connection;
