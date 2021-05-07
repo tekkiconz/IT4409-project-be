@@ -7,28 +7,30 @@ const requestHandler = (req, res) => {
     const [url, query] = req.url.split("?")
     const method = req.method;
 
-    console.log(url);
+    const [,route] = url.split("/");
+
+    const post = `post`;
+
+    const filter = {
+
+    };
+
+    console.log(route);
     console.log(query);
 
-    if (url === `/register`) {
+    if (route === `user`) {
         return registerHandler(req, res);
     }
-    if (url === `/login`) {
+    if (url === `product`) {
         return loginHander(req, res);
+    }
+    if (url === `admin`){
+        return ;
     }
     if (url === `/`) {
         res.statusCode = 200;
-        res.write('Server is active on Port 8000!');
+        res.write('Good morning! Server is currerntly active.');
         return res.end();
-    }
-    if (url === `/users`) {
-        //Handle api
-    }
-    if (url === `/files`) {
-        //Handle api
-    }
-    if (url === `/admin`) {
-        //Handle api
     }
     res.statusCode = 404;
     res.write(`API not found!`);
