@@ -46,9 +46,9 @@ class Router {
 		return this;
 	}
 
-	put(path, handler) {
+	post(path, handler) {
 		const route = this.route(path);
-		route.put(handler);
+		route.post(handler);
 		return this;
 	}
 }
