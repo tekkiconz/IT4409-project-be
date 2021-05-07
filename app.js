@@ -2,17 +2,14 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 
-const Coffee = require('./src/coffee');
+const routes = require(`./app-routes/routes`);
 
 const app = Coffee();
 
-app.use(cors());
-app.use('/about', (req, res) => {
-  res.send('I am the about page');
-});
 
-app.use('/', (req, res) => {
-  res.send("HelloWorld");
-});
+const host = process.env.HOST || 'localhost';
+const port = process.env.PORT || 8000;
 
-const server = app.listen(3000, () => console.log(`Server running on 3000`));
+server.listen(port, host, () => {
+  console.log(`Starting server on http://${host}:${port}`);
+});

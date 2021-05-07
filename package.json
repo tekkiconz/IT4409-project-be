@@ -17,8 +17,12 @@
   },
   "homepage": "https://github.com/tekkiconz/be#readme",
   "dependencies": {
+<<<<<<< HEAD
     "cors": "^2.8.5",
     "mongoose": "^5.12.3",
+=======
+    "mongoose": "^5.12.7",
+>>>>>>> e213747bd4d8c8615fe6ad449349ecd0b1ef5cc8
     "nodemon": "^2.0.7"
   }
 }

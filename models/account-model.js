@@ -1,25 +1,14 @@
-const mongoose = require('mongoose');
-// for online db
-const CONNECTION_STRING = 'mongodb+srv://webteam29:bookshare20202@booksharecluster.ikeoh.mongodb.net/bookshare-account';
-// for local db
-// const CONNECTION_STRING = 'mongodb://localhost:27017/bookshare-account';
+const mongoose = require('mongoose')
 
-mongoose.connect(CONNECTION_STRING, 
-{
-    useNewUrlParser: true, 
-    useUnifiedTopology: true
-});
+const UserSchema = new mongoose.Schema(
+	{
+		username: { type: String, required: true, unique: true},
+		password: { type: String, required: true },
+        email: {type: String}
+	},
+	{ collection: 'users' }
+)
 
-const Schema = mongoose.Schema;
+const model = mongoose.model('UserSchema', UserSchema)
 
-const AccountSchema = new Schema({
-    username: String,
-    password: String,
-    email: String
-}, {
-    collation: 'accounts'
-});
-
-const AccountModel = mongoose.model('accounts', AccountSchema)
-
-module.exports = AccountModel
+module.exports = model
