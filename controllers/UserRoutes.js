@@ -53,50 +53,68 @@ router.post('/users/login', async (req, res) => {
                 }
             }
         })
+        .catch(err => {
+            console.log("Error is", err.message);
+        });
 });
 
 router.get('/users/signout', async (req, res) => {
-    res.clearCookie('rememberme').status(200).end("Cleared Cookie");
+    res.clearCookie('userid').status(200).end("Cleared Cookie");
 });
 
-const findUserInfo = async uid => {
+async function findUserInfo(uid){
     await User.findOne({ _id: uid })
         .then((profile) => {
             if (!profile) {
                 return null;
             } else {
-                var user = {
+                console.log(profile);
+                return {
                     username: profile.username,
                     email: profile.email
                 };
-                return user;
             }
         })
 }
 
 router.get('/users/info', async (req, res) => {
     var uid = req.query.id;
-    var info = findUserInfo(uid);
-    if (info == null) {
-        res.status(404).end(`Can't get user's info`);
-    } else {
-        res.status(200).json(info).end();
-    }
+    await User.findOne({ _id: uid })
+        .then((profile) => {
+            if (!profile) {
+                res.status(404).end(`Can't get user's info with _id : ${uid}`);
+            } else {                
+                res.status(200).json({
+                    username: profile.username,
+                    email: profile.email
+                }).end();
+            }
+        });
 });
 
-router.get('/users/currentuser', (req, res) => {
-    if (!req.cookie) {
+router.get('/users/currentuser', async (req, res) => {
+    console.log("cookie:", req.header.cookie);
+    var cookie = req.headers.cookie;
+    if (!cookie) {
         res.status(404).end('Current User is not set');
-    } else {
-        var uid = res.cookie.userid;
-        console.log("current user id :", uid);
+    } else {        
+        var cookies = cookie.split('; ');
+        var tmp = cookies[0];
+        var uid = tmp.split('=');
+        var id = uid[1];
+        console.log("current user id :", id);
 
-        var info = findUserInfo(uid);
-        if (info == null) {
-            res.status(404).end(`Can't get current user's info`);
-        } else {
-            res.status(200).json(info).end();
-        }
+        await User.findOne({ _id: id })
+        .then((profile) => {
+            if (!profile) {
+                res.status(404).end(`Can't get current user's info`);
+            } else {                
+                res.status(200).json({
+                    username: profile.username,
+                    email: profile.email
+                }).end();
+            }
+        });
     }
 })
 
