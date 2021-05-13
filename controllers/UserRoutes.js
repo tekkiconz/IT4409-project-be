@@ -101,6 +101,47 @@ router.get('/users/currentuser', async (req, res) => {
             }
         });
     }
-})
+});
+
+// ------------------- GET ---------------------------
+// GET /api/books
+router.get('/books', async (req, res) => {
+    var page = req.query.page;
+    var orderBy = req.query.orderBy;
+    var category = req.query.category;
+
+});
+
+// GET /api/books/5
+router.get('/books/:bookID', async (req, res) =>{
+    console.log(req.params.productID);
+    
+});
+
+// GET /api/books/5/likes
+router.get('/books/:bookID/likes', async (req, res) => {
+
+});
+
+// GET /api/books/5/comments
+router.get('/books/:bookID/comments', async (req, res) => {
+
+});
+
+// ------------------- POST ---------------------------
+// POST /api/books
+router.post('books', async (req, res) => {
+
+});
+
+// POST /api/books/5/likes
+router.post('books/:bookID/likes', async (req, res) => {
+
+});
+
+// POST /api/books/5/comments
+router.post('books/:bookID/comments', async (req, res) => {
+
+});
 
 module.exports = router;
