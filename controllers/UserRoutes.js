@@ -62,21 +62,6 @@ router.get('/users/signout', async (req, res) => {
     res.clearCookie('userid').status(200).end("Cleared Cookie");
 });
 
-async function findUserInfo(uid){
-    await User.findOne({ _id: uid })
-        .then((profile) => {
-            if (!profile) {
-                return null;
-            } else {
-                console.log(profile);
-                return {
-                    username: profile.username,
-                    email: profile.email
-                };
-            }
-        })
-}
-
 router.get('/users/info', async (req, res) => {
     var uid = req.query.id;
     await User.findOne({ _id: uid })
