@@ -1,6 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
@@ -13,7 +12,7 @@ app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extened: true }));
 app.use(bodyParser.json());
 
-var port = process.env.PORT || 3000;
+var port = process.env.PORT || 8888;
 
 mongoose
   .connect(db)
