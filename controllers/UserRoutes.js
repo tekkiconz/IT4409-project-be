@@ -59,7 +59,7 @@ router.get('/users/signout', async (req, res) => {
     res.clearCookie('rememberme').status(200).end("Cleared Cookie");
 });
 
-const findUserInfo = uid => {
+const findUserInfo = async uid => {
     await User.findOne({ _id: uid })
         .then((profile) => {
             if (!profile) {
