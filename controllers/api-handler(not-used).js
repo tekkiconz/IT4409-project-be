@@ -1,7 +1,7 @@
 const http      = require('http');
 var MongoClient = require('mongodb').MongoClient;
 const mongoose  = require('mongoose');
-const BookModel = require('../models/book-model');
+const BookModel = require('../models/book');
 const dbRoute   = require('../app-routes/routes');
 
 

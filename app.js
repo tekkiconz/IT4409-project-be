@@ -1,27 +1,32 @@
-const Coffee = require('./src/coffee');
+const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
-const path = require('path');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
+const db = require('./helpers/configs').CONNECTION_STRING;
 
-const routes = require(`./app-routes/routes`);
-
-const app = Coffee();
+app = express();
 
 app.use(cors());
-app.use('/', (req, res) => {
-  res.send("hello");
-})
+app.use(express.static('public'));
+app.use(bodyParser.urlencoded({ extened: true }));
+app.use(bodyParser.json());
 
-app.get('/test', (req, res)=>{
-    res.end('TEST GET OK');
-})
+var port = process.env.PORT || 3000;
 
-app.post('/test', (req, res)=>{
-    console.log(req);
-    res.end('TEST POST OK');
-})
+mongoose
+  .connect(db)
+  .then(() => {
+    console.log("Database is connected");
+  })
+  .catch(err => {
+    console.log("Error: ", err.message);
+  });
 
-app.listen(3000, () => {
-  console.log("This app is running on port 3000");
+var userRoutes = require('./controllers/UserRoutes');
+app.use('/api', userRoutes);
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 })

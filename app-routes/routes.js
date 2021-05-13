@@ -1,9 +1,9 @@
 // const _url = require(`url`);
 const mongoose = require('mongoose')
 
-const registerHandler = require(`../controllers/register-handler`);
-const loginHandler = require(`../controllers/login-handler`);
-const apiHandler = require('../controllers/api-handler');
+const registerHandler = require(`../controllers/register-handler(not-used)`);
+const loginHandler = require(`../controllers/login-handler(not-used)`);
+const apiHandler = require('../controllers/api-handler(not-used)');
 
 // handle request
 const requestHandler = (req, res) => {
