@@ -1,5 +1,4 @@
 const mongoose = require('mongoose')
-const Like = require('like');
 
 const BookSchema = new mongoose.Schema(
     {        

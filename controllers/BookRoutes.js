@@ -173,12 +173,12 @@ router.post('books/:bookID/likes', async (req, res) => {
                     bookid: bid
                 });
 
-                await newLike.save()
+                newLike.save()
                     .then(() => {
                         console.log(`User ${uid} has liked book ${id}`);
                     })
                     .catch(err => console.log(`Error: ${err.message}`));
-                await Book.updateOne(
+                Book.updateOne(
                     { _id: bid },
                     {
                         $set: {
