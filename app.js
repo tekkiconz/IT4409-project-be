@@ -24,7 +24,10 @@ mongoose
   });
 
 var userRoutes = require('./controllers/UserRoutes');
-app.use('/api', userRoutes);
+var bookRoutes = require('./controllers/BookRoutes');
+
+app.use('/api/users', userRoutes);
+app.use('/api/books', bookRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

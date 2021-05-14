@@ -2,15 +2,16 @@ const mongoose = require('mongoose')
 const Like = require('like');
 
 const BookSchema = new mongoose.Schema(
-    {
-        id          : { type: Number, required: true, unique: true },
+    {        
         bookname    : { type: String, required: true   },
         author      : { type: String, required: true   },
         description : { type: String, required: true   },
-        uploader    : { type: String, required: true   },
-        uploadtime  : { type: Date, required: true     },
+        userid      : { type: String, required: true   },        
         category    : { type: String, required: true   },
-        likesCount  : { type : Number, required : true }
+        likesCount  : { type: Number, required: true  }
+    },
+    {
+        timestamps : true
     },
     { collection: 'books' }
 )

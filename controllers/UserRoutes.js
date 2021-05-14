@@ -3,7 +3,8 @@ const router = express.Router();
 
 const User = require('../models/user');
 
-router.post('/users/signup', async (req, res) => {
+// POST /api/users/signup
+router.post('/signup', async (req, res) => {
     var newUser = new User({
         username: req.body.username,
         password: req.body.password,
@@ -30,7 +31,8 @@ router.post('/users/signup', async (req, res) => {
         });
 });
 
-router.post('/users/login', async (req, res) => {
+// POST /api/users/login
+router.post('/login', async (req, res) => {
     var newUser = {};
     newUser.email = req.body.email;
     newUser.password = req.body.password;
@@ -58,11 +60,13 @@ router.post('/users/login', async (req, res) => {
         });
 });
 
-router.get('/users/signout', async (req, res) => {
+// GET /api/users/signout
+router.get('/signout', async (req, res) => {
     res.clearCookie('userid').status(200).end("Cleared Cookie");
 });
 
-router.get('/users/info', async (req, res) => {
+// GET /api/users/info
+router.get('/info', async (req, res) => {
     var uid = req.query.id;
     await User.findOne({ _id: uid })
         .then((profile) => {
@@ -77,7 +81,8 @@ router.get('/users/info', async (req, res) => {
         });
 });
 
-router.get('/users/currentuser', async (req, res) => {
+// GET /api/users/currentuser
+router.get('/currentuser', async (req, res) => {
     console.log("cookie:", req.header.cookie);
     var cookie = req.headers.cookie;
     if (!cookie) {
@@ -101,47 +106,6 @@ router.get('/users/currentuser', async (req, res) => {
             }
         });
     }
-});
-
-// ------------------- GET ---------------------------
-// GET /api/books
-router.get('/books', async (req, res) => {
-    var page = req.query.page;
-    var orderBy = req.query.orderBy;
-    var category = req.query.category;
-
-});
-
-// GET /api/books/5
-router.get('/books/:bookID', async (req, res) =>{
-    console.log(req.params.productID);
-    
-});
-
-// GET /api/books/5/likes
-router.get('/books/:bookID/likes', async (req, res) => {
-
-});
-
-// GET /api/books/5/comments
-router.get('/books/:bookID/comments', async (req, res) => {
-
-});
-
-// ------------------- POST ---------------------------
-// POST /api/books
-router.post('books', async (req, res) => {
-
-});
-
-// POST /api/books/5/likes
-router.post('books/:bookID/likes', async (req, res) => {
-
-});
-
-// POST /api/books/5/comments
-router.post('books/:bookID/comments', async (req, res) => {
-
 });
 
 module.exports = router;
