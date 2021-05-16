@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 
 const User = require('../models/user');
+const Activity = require('../models/activity');
+const auth = require('./middleware/auth');
 
 // POST /api/users/signup
 router.post('/signup', async (req, res) => {
@@ -67,7 +69,8 @@ router.get('/signout', async (req, res) => {
 
 // GET /api/users/info
 router.get('/info', async (req, res) => {
-    var uid = req.query.id;
+    var uid = req.body.id;
+    console.log(uid);
     await User.findOne({ _id: uid })
         .then((profile) => {
             if (!profile) {
@@ -81,15 +84,20 @@ router.get('/info', async (req, res) => {
         });
 });
 
+router.get('/me',auth,  async(req, res) => {
+     res.send(req.user)
+})
+
 // GET /api/users/currentuser
 router.get('/currentuser', async (req, res) => {
-    console.log("cookie:", req.header.cookie);
+    console.log("cookie:", req.headers.cookie);
     var cookie = req.headers.cookie;
     if (!cookie) {
         res.status(404).end('Current User is not set');
     } else {        
         var cookies = cookie.split('; ');
         var tmp = cookies[0];
+        console.log(tmp);
         var uid = tmp.split('=');
         var id = uid[1];
         console.log("current user id :", id);
@@ -106,6 +114,23 @@ router.get('/currentuser', async (req, res) => {
             }
         });
     }
+});
+
+
+router.get('/history', auth, async (req, res) => {
+
+    var uid = req.user._id;
+    console.log(uid)
+
+    await Activity.find(uid ? { userid: uid } : {})
+        .then(data => {
+            if (!data) {
+                res.status(200).end('Empty history');
+            } else {
+                res.status(200).json(data).end();
+            }
+        })
+        .catch(err => console.log(`Error: ${err.message}`));
 });
 
 module.exports = router;

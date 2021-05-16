@@ -4,6 +4,8 @@ const BOOKS_PER_PAGE = require('../helpers/configs').NUMBER_BOOK_PER_PAGE;
 const Book = require('../models/book');
 const Like = require('../models/like');
 const Comment = require('../models/comment');
+const Activity = require('../models/activity');
+const auth = require('./middleware/auth');
 
 
 // ------------------- GET ---------------------------
@@ -141,15 +143,23 @@ router.get('/books/:bookID/comments', async (req, res) => {
 
 // ------------------- POST ---------------------------
 // POST /api/books
-router.post('books', async (req, res) => {
+router.post('/', auth,  async (req, res) => {
     var newBook = new Book({
         bookname: req.body.bookname,
         author: req.body.author,
-        description: req.body.descript,
-        userid: req.body.userid,
+        description: req.body.description,
+        userid: req.user._id,
         category: req.body.category,
         likesCount: 0
     });
+    var newActivity = new Activity({
+        bookid: newBook._id,
+        bookname: newBook.bookname,
+        userid: req.user._id,
+        nameact: 'Post Book'
+    })
+    newActivity.save();
+    console.log(newActivity)
 
     await newBook.save()
         .then(() => {
@@ -159,46 +169,70 @@ router.post('books', async (req, res) => {
 });
 
 // POST /api/books/5/likes
-router.post('books/:bookID/likes', async (req, res) => {
-    var bid = req.params.bookid;
-    var uid = req.params.userid;
+router.post('/:bookID/likes', auth,  async (req, res) => {
+    var bid = req.params.bookID;
+    var uid = req.user._id;
+    const book = Book.findOne({_id:bid});
+    if (!book) {
+        throw new Error()
+    }
+    
+    
     await Like.findOne({ bookid: bid, userid: uid })
         .then(data => {
             if (data) {
                 res.status(403).end(`User ${uid} liked book ${bid}`);
             } else {
-                let currLikeCount = data.likesCount;
-                let newLike = new Like({
-                    userid: uid,
-                    bookid: bid
-                });
-
-                newLike.save()
-                    .then(() => {
-                        console.log(`User ${uid} has liked book ${id}`);
+                Book.findOne({_id:bid})
+                    .then(bdata => {
+                        var newActivity = new Activity({
+                            bookid: bid,
+                            userid: req.user._id,
+                            nameact: 'Like'
+                        })
+                        newActivity.save()
+                        let currLikeCount = bdata.likesCount;    
+                        let newLike = new Like({
+                            userid: uid,
+                            bookid: bid
+                        });
+        
+                        newLike.save()
+                            .then(() => {
+                                console.log(`User ${uid} has liked book ${bid}`);
+                            })
+                            .catch(err => console.log(`Error: ${err.message}`));
+                            
+                        Book.updateOne(
+                            { _id: bid },
+                            {
+                                $set: {
+                                    "likesCount": currLikeCount + 1
+                                }
+                            }
+                        );
                     })
                     .catch(err => console.log(`Error: ${err.message}`));
-                Book.updateOne(
-                    { _id: bid },
-                    {
-                        $set: {
-                            "likesCount": currLikeCount + 1
-                        }
-                    }
-                );
             }
         })
         .catch(err => console.log(`Error: ${err.message}`));
 });
 
 // POST /api/books/5/comments
-router.post('books/:bookID/comments', async (req, res) => {
+router.post('/:bookID/comments', auth, async (req, res) => {
     var bid = req.params.bookID;
     var newCmt = new Comment({
-        userid : req.body.uid,
+        userid : req.user._id,
         bookid : bid,
         cmt : req.body.cmt
     });
+    var newActivity = new Activity({
+        bookid: bid,
+        userid: req.user._id,
+        nameact: 'Comment'
+    })
+    newActivity.save()
+    console.log(newActivity)
     await newCmt.save()
         .then(()=>{
             res.status(200).end(`New comment on book ${bid}`);

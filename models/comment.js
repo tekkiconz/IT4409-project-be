@@ -2,8 +2,8 @@ const mongoose = require('mongoose')
 
 const CommentSchema = new mongoose.Schema(
 	{
-		userid  : { type: String, required: true, unique: true },
-		bookid  : { type: String, required: true, unique: true },
+		userid  : { type: String, required: true },
+		bookid  : { type: String, required: true },
         cmt     : { type: String, required : true}
 	},
     {
