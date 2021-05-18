@@ -141,6 +141,19 @@ router.get('/books/:bookID/comments', async (req, res) => {
         .catch(err => console.log(`Error: ${err.message}`));
 });
 
+// GET /api/books/category/5
+router.get('/books/category/:bid', async (req, res) => {
+    var bid = req.params.bid;
+    await Book.findOne({_id : bid})
+        .then(data => {
+            if(!data){
+                res.status(404).end('Book not found');
+            }
+            res.status(200).json({category : data.category}).end();
+        })
+        .catch(err => console.log(`Error: ${err.message}`));
+});
+
 // ------------------- POST ---------------------------
 // POST /api/books
 router.post('/', auth,  async (req, res) => {
