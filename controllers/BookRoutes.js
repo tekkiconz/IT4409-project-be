@@ -237,16 +237,15 @@ router.post('/', async (req, res) => {
     });
 });
 
+const fs = require('fs');
 // POST /api/books/images
 router.post('/images', async (req, res) => {
-    console.log(process.cwd());
-    var bookname = 'book_' + 1 + '.pdf';
-        var prevname = 'img_' + 1 + '';
-        var bookFile = req.files.bookfile;
-        var prevFile = req.files.prevfile;
-        var exts = prevFile.name.split('.');
-        var ext = '.' + exts[exts.length - 1];
-        console.log(ext);
+    var Base64String = req.body.pdf;
+    var base64file = Base64String.split(';base64,').pop();
+    //console.log(base64Img);
+    fs.writeFile('book.pdf', base64file, {encoding: 'base64'}, function(err) {
+        console.log('File created');
+    });
     res.end();
 })
 
