@@ -197,14 +197,14 @@ router.post('/', async (req, res) => {
         category: req.body.category,
         likesCount: 0
     });
-    // var newActivity = new Activity({
-    //     bookid: newBook._id,
-    //     bookname: newBook.bookname,
-    //     userid: req.user._id,
-    //     nameact: 'Post Book'
-    // })
-    // newActivity.save();
-    // console.log(newActivity)
+    var newActivity = new Activity({
+        bookid: newBook._id,
+        bookname: newBook.bookname,
+        userid: req.body.userid,
+        nameact: 'Post Book'
+    })
+    newActivity.save();
+    console.log(newActivity)
 
 
     // save book's info
