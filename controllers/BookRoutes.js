@@ -203,14 +203,18 @@ router.post('/', async (req, res) => {
         userid: req.body.userid,
         nameact: 'Post Book'
     })
-    newActivity.save();
-    console.log(newActivity)
-
 
     // save book's info
     await newBook.save((err, book) => {
         if (err) {
             console.log(`Error: ${err.message}`);
+            res.status(400).json({message: `Error: ${err.message}`});
+        }
+        //save activity
+        try{
+            newActivity.save();
+        }
+        catch(err){
             res.status(400).json({message: `Error: ${err.message}`});
         }
         // save file to server        
@@ -271,7 +275,12 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                             userid: req.user._id,
                             nameact: 'Like'
                         })
-                        newActivity.save()
+                        try{
+                            newActivity.save();
+                        }
+                        catch(err){
+                            res.status(400).json({message: `Error: ${err.message}`});
+                        }
                         let currLikeCount = bdata.likesCount;
                         let newLike = new Like({
                             userid: uid,
@@ -283,16 +292,22 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                                 console.log(`User ${uid} has liked book ${bid}`);
                             })
                             .catch(err => console.log(`Error: ${err.message}`));
+                        
+                        var b = new Book({
+                            _id: bid,
+                            bookname: bdata.bookname,
+                            author: bdata.author,
+                            description: bdata.description,
+                            userid: bdata.userid,
+                            category: bdata.category,
+                            likesCount: currLikeCount+1
+                        })
+                        console.log(b.likesCount)
+                        Book.findOneAndUpdate({_id: bid}, b, {upsert: true}, function(err, doc) {
+                            if (err) console.log(err)
+                        });
+                        res.status(200).end('Increase likeCounts')
 
-                        Book.updateOne(
-                            { _id: bid },
-                            {
-                                $set: {
-                                    "likesCount": currLikeCount + 1
-                                }
-                            }
-                        );
-                        res.status(200).end('Increased like count');
                     })
                     .catch(err => {
                         console.log(`Error: ${err.message}`);
@@ -319,11 +334,16 @@ router.post('/:bookID/comments', auth, async (req, res) => {
         userid: req.user._id,
         nameact: 'Comment'
     })
-    newActivity.save()
-    console.log(newActivity)
     await newCmt.save()
         .then(() => {
             res.status(200).end(`New comment on book ${bid}`);
+            try{
+                newActivity.save();
+            }
+            catch(err){
+                res.status(400).json({message: `Error: ${err.message}`});
+            }
+            console.log(newActivity)
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);

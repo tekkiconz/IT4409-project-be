@@ -30,6 +30,7 @@ router.post('/signup', async (req, res) => {
         })
         .catch(err => {
             console.log("Error is", err.message);
+            res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 
@@ -59,6 +60,7 @@ router.post('/login', async (req, res) => {
         })
         .catch(err => {
             console.log("Error is", err.message);
+            res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 
@@ -130,7 +132,10 @@ router.get('/history', auth, async (req, res) => {
                 res.status(200).json(data).end();
             }
         })
-        .catch(err => console.log(`Error: ${err.message}`));
+        .catch(err => {
+            console.log(`Error: ${err.message}`)
+            res.status(400).json({message: `Error: ${err.message}`});
+        });
 });
 
 module.exports = router;
