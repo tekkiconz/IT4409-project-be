@@ -53,7 +53,7 @@ router.post('/login', async (req, res) => {
                     res.cookie('userid', profile.id, { expires: new Date(Date.now() + 900000), httpOnly: true });
                     res.status(200).json(data).end();
                 } else {
-                    res.status(403).end("Wrong email or password"); // 403 Forbidden
+                    res.status(403).json({message: "Wrong email or password"}); // 403 Forbidden
                 }
             }
         })
@@ -74,7 +74,7 @@ router.get('/info', async (req, res) => {
     await User.findOne({ _id: uid })
         .then((profile) => {
             if (!profile) {
-                res.status(404).end(`Can't get user's info with _id : ${uid}`);
+                res.status(404).json({message: `Can't get user's info with _id : ${uid}`});
             } else {                
                 res.status(200).json({
                     username: profile.username,
@@ -93,7 +93,7 @@ router.get('/currentuser', async (req, res) => {
     console.log("cookie:", req.headers.cookie);
     var cookie = req.headers.cookie;
     if (!cookie) {
-        res.status(404).end('Current User is not set');
+        res.status(404).json({message: 'Current User is not set'});
     } else {        
         var cookies = cookie.split('; ');
         var tmp = cookies[0];
@@ -105,7 +105,7 @@ router.get('/currentuser', async (req, res) => {
         await User.findOne({ _id: id })
         .then((profile) => {
             if (!profile) {
-                res.status(404).end(`Can't get current user's info`);
+                res.status(404).json({message:`Can't get current user's info`});
             } else {                
                 res.status(200).json({
                     username: profile.username,

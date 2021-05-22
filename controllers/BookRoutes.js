@@ -40,8 +40,8 @@ router.get('/books', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
-                    res.status(400).json({message :`Error: ${err.message}`});
+                    res.status(400).json({message :`Error: ${err.message}`});//in ra
+                    res.status(400).json({message :`Error: ${err.message}`});//gui response ve
                 });
             break;
         case 'author':
@@ -55,8 +55,8 @@ router.get('/books', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
-                    res.status(400).json({message: `Error: ${err.message}`});
+                    res.status(400).json({message :`Error: ${err.message}`});//in ra
+                    res.status(400).json({message :`Error: ${err.message}`});//gui response ve
                 });
             break;
         case 'category':
@@ -70,8 +70,8 @@ router.get('/books', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
-                    res.status(400).json({message :`Error: ${err.message}`});
+                    res.status(400).json({message :`Error: ${err.message}`});//in ra
+                    res.status(400).json({message :`Error: ${err.message}`});//gui response ve
                 });
             break;
         case 'userid':
@@ -85,8 +85,8 @@ router.get('/books', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
-                    res.status(400).json({message: `Error: ${err.message}`});
+                    res.status(400).json({message :`Error: ${err.message}`});//in ra
+                    res.status(400).json({message :`Error: ${err.message}`});//gui response ve
                 });
             break;
         default: // sort by name
@@ -100,8 +100,8 @@ router.get('/books', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
-                    res.status(400).json({message: `Error: ${err.message}`});
+                    res.status(400).json({message :`Error: ${err.message}`});//in ra
+                    res.status(400).json({message :`Error: ${err.message}`});//gui response ve
                 });
             break;
     }
@@ -123,8 +123,8 @@ router.get('/books/:bookID', async (req, res) => {
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
@@ -143,8 +143,8 @@ router.get('/books/:bookID/likes', async (req, res) => {
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
@@ -165,8 +165,8 @@ router.get('/books/:bookID/comments', async (req, res) => {
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+                res.status(400).json({message :`Error: ${err.message}`});//in ra
+                res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
@@ -180,8 +180,8 @@ router.get('/books/categories', async (req, res) => {
             res.status(200).json(data).end();
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+                res.status(400).json({message :`Error: ${err.message}`});//in ra
+                res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
@@ -210,8 +210,8 @@ router.post('/', async (req, res) => {
     // save book's info
     await newBook.save((err, book) => {
         if (err) {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         }
         // save file to server        
         var bookFile = req.files.bookfile;
@@ -295,14 +295,14 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                         res.status(200).end('Increased like count');
                     })
                     .catch(err => {
-                        console.log(`Error: ${err.message}`);
-                        res.status(400).json({message: `Error: ${err.message}`});
+                        res.status(400).json({message :`Error: ${err.message}`});//in ra
+                         res.status(400).json({message :`Error: ${err.message}`});//gui response ve
                     });
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
@@ -326,8 +326,8 @@ router.post('/:bookID/comments', auth, async (req, res) => {
             res.status(200).end(`New comment on book ${bid}`);
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
@@ -342,8 +342,8 @@ router.post('/books/categories', async (req, res) => {
             res.status(200).end(`New category: ${ctype}`);
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
