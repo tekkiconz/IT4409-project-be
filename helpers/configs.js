@@ -30,6 +30,6 @@ module.exports = {
         { type : 'Social Sciences'},
         { type : 'Sports'},
         { type : 'Teen'},
-        { type : 'Travel'},
+        { type : 'Travel'}
     ]
 };

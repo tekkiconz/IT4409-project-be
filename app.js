@@ -20,9 +20,16 @@ mongoose
   .connect(db, { useFindAndModify: false })
   .then(() => {
     console.log("Database is connected");
+    console.log(initial_cats);
     categoryModel.insertMany({
-      initial_cats      
-    });
+      initial_cats
+    }).then(() => {
+      console.log('Init categories');
+    })
+    .catch(err => {
+      console.log("error when init categories");
+      console.log(err.message);
+    })
   })
   .catch(err => {
     console.log("Error: ", err.message);
