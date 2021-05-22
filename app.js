@@ -7,7 +7,9 @@ const db = require('./helpers/configs').CONNECTION_STRING;
 
 app = express();
 
-app.use(cors());
+app.use(cors(
+  { credentials: true, origin: 'http://localhost:3000' }
+));
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extened: true }));
 app.use(bodyParser.json());
