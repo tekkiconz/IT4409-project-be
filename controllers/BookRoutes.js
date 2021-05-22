@@ -34,14 +34,14 @@ router.get('/books', async (req, res) => {
                 .sort({ bookname: 1 })
                 .then(data => {
                     if (!data) {
-                        res.status(404).end('books not found');
+                        res.status(404).json({ message:'books not found'});
                     } else {
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
                     console.log(`Error: ${err.message}`);
-                    res.status(400).end(`Error: ${err.message}`);
+                    res.status(400).json({message :`Error: ${err.message}`});
                 });
             break;
         case 'author':
@@ -49,14 +49,14 @@ router.get('/books', async (req, res) => {
                 .sort({ author: 1 })
                 .then(data => {
                     if (!data) {
-                        res.status(404).end('books not found');
+                        res.status(404).json({message:'books not found'});
                     } else {
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
                     console.log(`Error: ${err.message}`);
-                    res.status(400).end(`Error: ${err.message}`);
+                    res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
         case 'category':
@@ -64,14 +64,14 @@ router.get('/books', async (req, res) => {
                 .sort({ category: 1 })
                 .then(data => {
                     if (!data) {
-                        res.status(404).end('books not found');
+                        res.status(404).json({message: 'books not found'});
                     } else {
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
                     console.log(`Error: ${err.message}`);
-                    res.status(400).end(`Error: ${err.message}`);
+                    res.status(400).json({message :`Error: ${err.message}`});
                 });
             break;
         case 'userid':
@@ -79,14 +79,14 @@ router.get('/books', async (req, res) => {
                 .sort({ userid: 1 })
                 .then(data => {
                     if (!data) {
-                        res.status(404).end('books not found');
+                        res.status(404).json({message: 'books not found'});
                     } else {
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
                     console.log(`Error: ${err.message}`);
-                    res.status(400).end(`Error: ${err.message}`);
+                    res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
         default: // sort by name
@@ -94,14 +94,14 @@ router.get('/books', async (req, res) => {
                 .sort({ bookname: 1 })
                 .then(data => {
                     if (!data) {
-                        res.status(404).end('books not found');
+                        res.status(404).json({message: 'books not found'});
                     } else {
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
                     console.log(`Error: ${err.message}`);
-                    res.status(400).end(`Error: ${err.message}`);
+                    res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
     }
@@ -124,7 +124,7 @@ router.get('/books/:bookID', async (req, res) => {
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);
-            res.status(400).end(`Error: ${err.message}`);
+            res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 
@@ -144,7 +144,7 @@ router.get('/books/:bookID/likes', async (req, res) => {
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);
-            res.status(400).end(`Error: ${err.message}`);
+            res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 
@@ -166,7 +166,7 @@ router.get('/books/:bookID/comments', async (req, res) => {
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);
-            res.status(400).end(`Error: ${err.message}`);
+            res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 
@@ -175,13 +175,13 @@ router.get('/books/categories', async (req, res) => {
     await Category.find({})
         .then(data => {
             if (!data) {
-                res.status(404).end('not found any categories');
+                res.status(404).json({message: 'not found any categories'});
             }
             res.status(200).json(data).end();
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);
-            res.status(400).end(`Error: ${err.message}`);
+            res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 
@@ -203,15 +203,19 @@ router.post('/', async (req, res) => {
         userid: req.body.userid,
         nameact: 'Post Book'
     })
-    newActivity.save();
-    console.log(newActivity)
-
 
     // save book's info
     await newBook.save((err, book) => {
         if (err) {
             console.log(`Error: ${err.message}`);
-            res.status(400).end(`Error: ${err.message}`);
+            res.status(400).json({message: `Error: ${err.message}`});
+        }
+        //save activity
+        try{
+            newActivity.save();
+        }
+        catch(err){
+            res.status(400).json({message: `Error: ${err.message}`});
         }
         // save file to server        
         var bookFile = req.files.bookfile;
@@ -223,12 +227,12 @@ router.post('/', async (req, res) => {
 
         bookFile.mv(process.cwd() + '/public/books/' + bookname, error => {
             if (error) {
-                res.status(400).end(`Error: ${err.message}`);
+                res.status(400).json({message: `Error: ${err.message}`});
             }
         });
         prevFile.mv(process.cwd() + '/public/book-previews/' + prevname, error => {
             if (error) {
-                res.status(400).end(`Error: ${err.message}`);
+                res.status(400).json({message: `Error: ${err.message}`});
             }
         });
         newBook.bookname = bookname;
@@ -262,7 +266,7 @@ router.post('/:bookID/likes', auth, async (req, res) => {
     await Like.findOne({ bookid: bid, userid: uid })
         .then(data => {
             if (data) {
-                res.status(403).end(`User ${uid} liked book ${bid}`);
+                res.status(403).json({message: `User ${uid} liked book ${bid}`});
             } else {
                 Book.findOne({ _id: bid })
                     .then(bdata => {
@@ -271,7 +275,12 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                             userid: req.user._id,
                             nameact: 'Like'
                         })
-                        newActivity.save()
+                        try{
+                            newActivity.save();
+                        }
+                        catch(err){
+                            res.status(400).json({message: `Error: ${err.message}`});
+                        }
                         let currLikeCount = bdata.likesCount;
                         let newLike = new Like({
                             userid: uid,
@@ -283,26 +292,32 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                                 console.log(`User ${uid} has liked book ${bid}`);
                             })
                             .catch(err => console.log(`Error: ${err.message}`));
+                        
+                        var b = new Book({
+                            _id: bid,
+                            bookname: bdata.bookname,
+                            author: bdata.author,
+                            description: bdata.description,
+                            userid: bdata.userid,
+                            category: bdata.category,
+                            likesCount: currLikeCount+1
+                        })
+                        console.log(b.likesCount)
+                        Book.findOneAndUpdate({_id: bid}, b, {upsert: true}, function(err, doc) {
+                            if (err) console.log(err)
+                        });
+                        res.status(200).end('Increase likeCounts')
 
-                        Book.updateOne(
-                            { _id: bid },
-                            {
-                                $set: {
-                                    "likesCount": currLikeCount + 1
-                                }
-                            }
-                        );
-                        res.status(200).end('Increased like count');
                     })
                     .catch(err => {
                         console.log(`Error: ${err.message}`);
-                        res.status(400).end(`Error: ${err.message}`);
+                        res.status(400).json({message: `Error: ${err.message}`});
                     });
             }
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);
-            res.status(400).end(`Error: ${err.message}`);
+            res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 
@@ -319,15 +334,20 @@ router.post('/:bookID/comments', auth, async (req, res) => {
         userid: req.user._id,
         nameact: 'Comment'
     })
-    newActivity.save()
-    console.log(newActivity)
     await newCmt.save()
         .then(() => {
             res.status(200).end(`New comment on book ${bid}`);
+            try{
+                newActivity.save();
+            }
+            catch(err){
+                res.status(400).json({message: `Error: ${err.message}`});
+            }
+            console.log(newActivity)
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);
-            res.status(400).end(`Error: ${err.message}`);
+            res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 
@@ -343,7 +363,7 @@ router.post('/books/categories', async (req, res) => {
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);
-            res.status(400).end(`Error: ${err.message}`);
+            res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 

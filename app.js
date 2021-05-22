@@ -17,7 +17,7 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 8888;
 
 mongoose
-  .connect(db)
+  .connect(db, { useFindAndModify: false })
   .then(() => {
     console.log("Database is connected");
   })
