@@ -17,19 +17,26 @@ app.use(bodyParser.json());
 var port = process.env.PORT || 8888;
 
 mongoose
-  .connect(db, { useFindAndModify: false })
+  .connect(db, { useUnifiedTopology: true })
   .then(() => {
     console.log("Database is connected");
-    console.log(initial_cats);
-    categoryModel.insertMany({
-      initial_cats
-    }).then(() => {
-      console.log('Init categories');
-    })
-    .catch(err => {
-      console.log("error when init categories");
-      console.log(err.message);
-    })
+    // console.log(initial_cats);
+
+    categoryModel.find({}).then((data) => { 
+      if(JSON.stringify(data) == '[]'){
+        categoryModel.insertMany(
+          initial_cats
+        ).then(() => {
+          console.log('Init categories');
+        })
+        .catch(err => {
+          console.log("error when init categories");
+          console.log(err.message);
+        })
+      } else {
+        console.log('Categories exist');        
+      }
+    });
   })
   .catch(err => {
     console.log("Error: ", err.message);

@@ -2,13 +2,13 @@ const express = require('express');
 const router = express.Router();
 const BOOKS_PER_PAGE = require('../helpers/configs').BOOKS_PER_PAGE;
 const COMMENTS_PER_PAGE = require('../helpers/configs').COMMENTS_PER_PAGE;
+const host = require('../helpers/configs').HOST;
 const Book = require('../models/book');
 const Like = require('../models/like');
 const Comment = require('../models/comment');
 const Activity = require('../models/activity');
 const Category = require('../models/category');
 const fileUpload = require('express-fileupload');
-const host = require('../helpers/configs').HOST;
 
 router.use(fileUpload());
 
@@ -16,24 +16,32 @@ const auth = require('./middleware/auth');
 
 
 // ------------------- GET ---------------------------
-// GET /api/books
+// GET /api/books?page=1&orderBy=bookname
 router.get('/', async (req, res) => {
 
     // page start at index 0
     var page = req.query.page;
     var ord = req.query.orderBy;
     var cat = req.query.category;
-
-    var start = page * BOOKS_PER_PAGE;
-    var end = (page + 1) * BOOKS_PER_PAGE;
+    var bid = req.query.bookid;
+    
+    if(page){
+        var start = page * BOOKS_PER_PAGE;
+        var end = (page + 1) * BOOKS_PER_PAGE;
+    } else { 
+        page = 0;
+    }
+    var queryObj = {};
+    if(cat) queryObj.category = cat;
+    else if(bid) queryObj._id = bid; 
 
     // Sort: 1 -> ASC
     //      -1 -> DESC
 
     switch (ord) {
-        case 'bookName':
-            await Book.find(cat ? { category: cat } : {})
-                .sort({ bookname: 1 })
+        case 'bookname':
+            await Book.find(queryObj)
+                .sort({ "bookname": 1 })
                 .then(data => {
                     if (!data) {
                         res.status(404).json({ message:'books not found'});
@@ -48,7 +56,7 @@ router.get('/', async (req, res) => {
                 });
             break;
         case 'author':
-            await Book.find(cat ? { category: cat } : {})
+            await Book.find(queryObj)
                 .sort({ author: 1 })
                 .then(data => {
                     if (!data) {
@@ -63,7 +71,7 @@ router.get('/', async (req, res) => {
                 });
             break;
         case 'category':
-            await Book.find(cat ? { category: cat } : {})
+            await Book.find(queryObj)
                 .sort({ category: 1 })
                 .then(data => {
                     if (!data) {
@@ -78,7 +86,7 @@ router.get('/', async (req, res) => {
                 });
             break;
         case 'userid':
-            await Book.find(cat ? { category: cat } : {})
+            await Book.find(queryObj)
                 .sort({ userid: 1 })
                 .then(data => {
                     if (!data) {
@@ -93,7 +101,7 @@ router.get('/', async (req, res) => {
                 });
             break;
         default: // sort by name
-            await Book.find(cat ? { category: cat } : {})
+            await Book.find(queryObj)
                 .sort({ bookname: 1 })
                 .then(data => {
                     if (!data) {
@@ -110,30 +118,9 @@ router.get('/', async (req, res) => {
     }
 });
 
-// GET /api/books/5
-router.get('/:bookID', async (req, res) => {
-    var bid = req.params.bookID;
-    console.log(bid);
-    await Book.findOne({ _id: bid })
-        .then(data => {
-            if (!data) {
-                res
-                    .status(404)
-                    .json({ err: `Book (ID : ${bid}) not found` })
-                    .end();
-            } else {
-                res.status(200).json(data).end();
-            }
-        })
-        .catch(err => {
-            // console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
-        });
-});
-
-// GET /api/books/5/likes
-router.get('/:bookID/likes', async (req, res) => {
-    var bid = req.params.bookID;
+// GET /api/books/5/likes?bookid=_
+router.get('/:bookid/likes', async (req, res) => {
+    var bid = req.params.bookid;
     await Book.findOne({ _id: bid })
         .then(data => {
             if (!data) {
@@ -151,9 +138,9 @@ router.get('/:bookID/likes', async (req, res) => {
         });
 });
 
-// GET /api/books/5/comments
-router.get('/:bookID/comments', async (req, res) => {
-    var bid = req.params.bookID;
+// GET /api/books/5/comments?bookid=_&page=_
+router.get('/:bookid/comments', async (req, res) => {
+    var bid = req.params.bookid;
     var page = req.query.page;
 
     var start = page * COMMENTS_PER_PAGE;
@@ -168,7 +155,7 @@ router.get('/:bookID/comments', async (req, res) => {
                     .end();
             } else {
                 // console.log('books:', data);
-                res.status(200).json(data.slice(start, end)).end();
+                res.status(200).json(data.slice(start, end));
             }
         })
         .catch(err => {
@@ -179,15 +166,15 @@ router.get('/:bookID/comments', async (req, res) => {
 
 // GET /api/books/categories
 router.get('/categories', async (req, res) => {
-    await Category.find({})
+    await Category.find()
         .then(data => {
-            if (!data) {
+            if (JSON.stringify(data) == '[]') {
                 res.status(404).json({message: 'not found any categories'});
             }
-            res.status(200).json(data).end();
+            res.status(200).json(data);
         })
         .catch(err => {
-            // console.log(`Error: ${err.message}`);
+            console.log(`Error: ${err.message}`);
             res.status(400).json({message: `Error: ${err.message}`});
         });
 });
@@ -363,7 +350,7 @@ router.post('/:bookID/comments', auth, async (req, res) => {
 });
 
 // POST /api/books/categories
-router.post('/books/categories', async (req, res) => {
+router.post('/categories', async (req, res) => {
     var ctype = req.body.type;
     var newCat = new Category({
         type: ctype
