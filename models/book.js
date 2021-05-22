@@ -7,7 +7,9 @@ const BookSchema = new mongoose.Schema(
         description : { type: String, required: true   },
         userid      : { type: String, required: true   },        
         category    : { type: String, required: true   },
-        likesCount  : { type: Number, required: true  }
+        likesCount  : { type: Number, required: true   },
+        bookpath    : { type: String, required: true   },
+        prevpath    : { type: String, required: true   }
     },
     {
         timestamps : true
