@@ -24,11 +24,12 @@ router.get('/', async (req, res) => {
     var cat = req.query.category;
     var bid = req.query.bookid;
     
+    // page start at 1
     if(page){
-        var start = page * BOOKS_PER_PAGE;
-        var end = (page + 1) * BOOKS_PER_PAGE;
+        var start = (page - 1) * BOOKS_PER_PAGE;
+        var end = page * BOOKS_PER_PAGE;
     } else { 
-        page = 0;
+        page = 1;
     }
     var queryObj = {};
     if(cat) queryObj.category = cat;
@@ -136,8 +137,8 @@ router.get('/:bookid/comments', async (req, res) => {
     var bid = req.params.bookid;
     var page = req.query.page;
 
-    var start = page * COMMENTS_PER_PAGE;
-    var end = (page + 1) * COMMENTS_PER_PAGE;
+    var start = (page - 1) * COMMENTS_PER_PAGE;
+    var end = page * COMMENTS_PER_PAGE;
 
     await Comment.find({ bookID: bid }).sort({ createAt: 1 })
         .then(data => {
