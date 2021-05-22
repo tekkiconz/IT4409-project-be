@@ -16,14 +16,15 @@ router.post('/signup', async (req, res) => {
     await User.findOne({ email: newUser.email })
         .then(async profile => {
             if (!profile) {
-                await newUser
-                    .save()
+                await newUser.save()
                     .then(() => {
-                        res.cookie('userid', profile.id, { expires: new Date(Date.now() + 900000), httpOnly: true });
+                        var id = newUser.id
+                        res.cookie('userid', id, { expires: new Date(Date.now() + 900000), httpOnly: true });
                         res.status(200).json(newUser).end();
                     })
                     .catch(err => {
                         console.log("Error: ", err.message);
+                        res.status(400).json({message: `Error: ${err.message}`});
                     });
             } else {
                 res.end("User already exists...");

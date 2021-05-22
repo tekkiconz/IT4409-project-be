@@ -184,60 +184,66 @@ router.get('/categories', async (req, res) => {
 router.post('/', auth, async (req, res) => {
     var bookFile    = req.files.bookfile;
     var prevFile    = req.files.prevfile;
-    var exts        = prevFile.name.split('.');
-    var ext         = '.' + exts[exts.length - 1];
-    
-    // get book's info
-    var newBook = new Book({
-        bookname    : req.body.bookname,
-        author      : req.body.author,
-        description : req.body.description,
-        userid      : req.user._id,
-        category    : req.body.category,        
-        bookpath    : `${host}/books/book_test.pdf`,
-        prevpath    : `${host}/book-previews/img_test.png`,
-        likesCount  : 0
-    });
-    
-    var newActivity = new Activity({
-        bookid  : newBook._id,
-        bookname: newBook.bookname,
-        userid  : req.body.userid,
-        nameact : 'Post Book'
-    })
-
-    newBook.bookpath = `${host}/books/book_${newBook._id}.pdf`;
-    newBook.prevpath = `${host}/book-previews/img_${newBook.id}${ext}`;
-
-    // save book's info
-    await newBook.save((err, book) => {
-        if (err) {
-            res.status(400).json({message :`Error: ${err.message}`});//in ra
-            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
-        }
-        //save activity        
-        try{
-            newActivity.save();
-        }
-        catch(err){
-            res.status(400).json({message: `Error: ${err.message}`});
-        }
-
-        // save file to server                        
-        bookFile.mv(process.cwd() + `/public/books/book_${book.id}.pdf`, error => {
-            if (error) {
-                res.status(400).json({message: `Error: ${err.message}`});
-            }
-
+    if(bookFile == null || prevFile == null){
+        res.status(400).json({message: 'Not found bookfile or frevfile'})
+    }
+    else{
+        var exts        = prevFile.name.split('.');
+        var ext         = '.' + exts[exts.length - 1];
+        
+        // get book's info
+        var newBook = new Book({
+            bookname    : req.body.bookname,
+            author      : req.body.author,
+            description : req.body.description,
+            userid      : req.user._id,
+            category    : req.body.category,
+            likesCount  : 0,
+            bookpath    : `${host}/books/book_test.pdf`,
+            prevpath    : `${host}/book-previews/img_test.png`,
         });
-        prevFile.mv(process.cwd() + `/public/book-previews/img_${book.id}${ext}`, error => {
-            if (error) {
-                res.status(400).json({message: `Error: ${err.message}`});
+        
+        var newActivity = new Activity({
+            bookid  : newBook._id,
+            bookname: newBook.bookname,
+            userid  : req.user._id,
+            nameact : 'Post Book'
+        })
+
+        newBook.bookpath = `${host}/books/book_${newBook._id}.pdf`;
+        newBook.prevpath = `${host}/book-previews/img_${newBook.id}${ext}`;
+
+        // save book's info
+        await newBook.save((err, book) => {
+            if (err) {
+                res.status(400).json({message :`Error: ${err.message}`});//gui response ve
+            }
+            else{
+                //save activity        
+                try{
+                    newActivity.save();
+                }
+                catch(err){
+                    res.status(400).json({message: `Error: ${err.message}`});
+                }
+
+                // save file to server                        
+                bookFile.mv(process.cwd() + `/public/books/book_${book.id}.pdf`, error => {
+                    if (error) {
+                        res.status(400).json({message: `Error: ${err.message}`});
+                    }
+
+                });
+                prevFile.mv(process.cwd() + `/public/book-previews/img_${book.id}${ext}`, error => {
+                    if (error) {
+                        res.status(400).json({message: `Error: ${err.message}`});
+                    }
+                });
+
+                res.status(200).json(newBook);
             }
         });
-
-        res.status(200).json(newBook).end();
-    });
+    }
 });
 
 // const fs = require('fs');
@@ -309,13 +315,11 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                     })
                     .catch(err => {
                         res.status(400).json({message :`Error: ${err.message}`});//in ra
-                         res.status(400).json({message :`Error: ${err.message}`});//gui response ve
                     });
             }
         })
         .catch(err => {
             res.status(400).json({message :`Error: ${err.message}`});//in ra
-            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
@@ -335,16 +339,16 @@ router.post('/:bookID/comments', auth, async (req, res) => {
     await newCmt.save()
         .then(() => {
             res.status(200).end(`New comment on book ${bid}`);
+            //save activity
             try{
                 newActivity.save();
             }
             catch(err){
                 res.status(400).json({message: `Error: ${err.message}`});
             }
-            console.log(newActivity)
+            // console.log(newActivity)
         })
         .catch(err => {
-            res.status(400).json({message :`Error: ${err.message}`});//in ra
             res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
@@ -352,15 +356,15 @@ router.post('/:bookID/comments', auth, async (req, res) => {
 // POST /api/books/categories
 router.post('/categories', async (req, res) => {
     var ctype = req.body.type;
+    // console.log(ctype)
     var newCat = new Category({
-        type: ctype
+        name: ctype
     });
     await newCat.save()
         .then(() => {
             res.status(200).end(`New category: ${ctype}`);
         })
         .catch(err => {
-            res.status(400).json({message :`Error: ${err.message}`});//in ra
             res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
