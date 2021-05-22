@@ -7,6 +7,7 @@ const Comment = require('../models/comment');
 const Activity = require('../models/activity');
 const Category = require('../models/category');
 const fileUpload = require('express-fileupload');
+const host = require('../helpers/configs').HOST;
 
 router.use(fileUpload());
 
@@ -36,6 +37,7 @@ router.get('/books', async (req, res) => {
                     if (!data) {
                         res.status(404).json({ message:'books not found'});
                     } else {
+                        data.bookpath = `${host}/public/img_${data.id}`;
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
