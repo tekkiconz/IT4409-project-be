@@ -18,7 +18,6 @@ const auth = require('./middleware/auth');
 // ------------------- GET ---------------------------
 // GET /api/books?page=1&orderBy=bookname
 router.get('/', async (req, res) => {
-
     // page start at index 0
     var page = req.query.page;
     var ord = req.query.orderBy;
@@ -51,7 +50,6 @@ router.get('/', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message :`Error: ${err.message}`});
                 });
             break;
@@ -66,7 +64,6 @@ router.get('/', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
@@ -81,7 +78,6 @@ router.get('/', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message :`Error: ${err.message}`});
                 });
             break;
@@ -96,7 +92,6 @@ router.get('/', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
@@ -111,7 +106,6 @@ router.get('/', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
@@ -133,7 +127,6 @@ router.get('/:bookid/likes', async (req, res) => {
             }
         })
         .catch(err => {
-            // console.log(`Error: ${err.message}`);
             res.status(400).json({message: `Error: ${err.message}`});
         });
 });
@@ -154,12 +147,10 @@ router.get('/:bookid/comments', async (req, res) => {
                     .json({ err: 'Fail to get book comments' })
                     .end();
             } else {
-                // console.log('books:', data);
                 res.status(200).json(data.slice(start, end));
             }
         })
         .catch(err => {
-            // console.log(`Error: ${err.message}`);
             res.status(400).json({message: `Error: ${err.message}`});
         });
 });
@@ -212,8 +203,7 @@ router.post('/', auth, async (req, res) => {
     // save book's info
     await newBook.save((err, book) => {
         if (err) {
-            res.status(400).json({message :`Error: ${err.message}`});//in ra
-            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
+            res.status(400).json({message :`Error: ${err.message}`});
         }
         //save activity        
         try{
@@ -308,14 +298,12 @@ router.post('/:bookID/likes', auth, async (req, res) => {
 
                     })
                     .catch(err => {
-                        res.status(400).json({message :`Error: ${err.message}`});//in ra
-                         res.status(400).json({message :`Error: ${err.message}`});//gui response ve
+                         res.status(400).json({message :`Error: ${err.message}`});
                     });
             }
         })
         .catch(err => {
-            res.status(400).json({message :`Error: ${err.message}`});//in ra
-            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
+            res.status(400).json({message :`Error: ${err.message}`});
         });
 });
 
@@ -343,8 +331,7 @@ router.post('/:bookID/comments', auth, async (req, res) => {
             }
             console.log(newActivity)
         })
-        .catch(err => {
-            res.status(400).json({message :`Error: ${err.message}`});//in ra
+        .catch(err => {            
             res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
@@ -360,8 +347,7 @@ router.post('/categories', async (req, res) => {
             res.status(200).end(`New category: ${ctype}`);
         })
         .catch(err => {
-            res.status(400).json({message :`Error: ${err.message}`});//in ra
-            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
+            res.status(400).json({message :`Error: ${err.message}`});
         });
 });
 
