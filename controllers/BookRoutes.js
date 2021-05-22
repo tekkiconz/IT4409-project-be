@@ -39,13 +39,11 @@ router.get('/', async (req, res) => {
                         res.status(404).json({ message:'books not found'});
                     } else {
                         // data is an array of book-info
-                        // data.bookpath = `${host}/public/books/book_${data.id}.pdf`;
-                        // data.prevpath = `${host}/public/book-previews/img_${data.id}${data.img_ext}`;
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
+                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message :`Error: ${err.message}`});
                 });
             break;
@@ -60,7 +58,7 @@ router.get('/', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
+                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
@@ -75,7 +73,7 @@ router.get('/', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
+                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message :`Error: ${err.message}`});
                 });
             break;
@@ -90,7 +88,7 @@ router.get('/', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
+                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
@@ -105,7 +103,7 @@ router.get('/', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
+                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
@@ -128,7 +126,7 @@ router.get('/:bookID', async (req, res) => {
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
+            // console.log(`Error: ${err.message}`);
             res.status(400).json({message: `Error: ${err.message}`});
         });
 });
@@ -148,7 +146,7 @@ router.get('/:bookID/likes', async (req, res) => {
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
+            // console.log(`Error: ${err.message}`);
             res.status(400).json({message: `Error: ${err.message}`});
         });
 });
@@ -169,12 +167,12 @@ router.get('/:bookID/comments', async (req, res) => {
                     .json({ err: 'Fail to get book comments' })
                     .end();
             } else {
-                console.log('books:', data);
+                // console.log('books:', data);
                 res.status(200).json(data.slice(start, end)).end();
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
+            // console.log(`Error: ${err.message}`);
             res.status(400).json({message: `Error: ${err.message}`});
         });
 });
@@ -189,7 +187,7 @@ router.get('/categories', async (req, res) => {
             res.status(200).json(data).end();
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
+            // console.log(`Error: ${err.message}`);
             res.status(400).json({message: `Error: ${err.message}`});
         });
 });

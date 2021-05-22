@@ -2,8 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const categoryModel = require('./models/category');
 
 const db = require('./helpers/configs').CONNECTION_STRING;
+const initial_cats = require('./helpers/configs').INIT_CATEGORIES;
 
 app = express();
 
@@ -18,6 +20,9 @@ mongoose
   .connect(db, { useFindAndModify: false })
   .then(() => {
     console.log("Database is connected");
+    categoryModel.insertMany({
+      initial_cats      
+    });
   })
   .catch(err => {
     console.log("Error: ", err.message);
