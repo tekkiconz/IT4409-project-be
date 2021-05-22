@@ -225,8 +225,8 @@ router.post('/', auth, async (req, res) => {
     // save book's info
     await newBook.save((err, book) => {
         if (err) {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         }
         //save activity        
         try{
@@ -321,14 +321,14 @@ router.post('/:bookID/likes', auth, async (req, res) => {
 
                     })
                     .catch(err => {
-                        console.log(`Error: ${err.message}`);
-                        res.status(400).json({message: `Error: ${err.message}`});
+                        res.status(400).json({message :`Error: ${err.message}`});//in ra
+                         res.status(400).json({message :`Error: ${err.message}`});//gui response ve
                     });
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
@@ -357,8 +357,8 @@ router.post('/:bookID/comments', auth, async (req, res) => {
             console.log(newActivity)
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
@@ -373,8 +373,8 @@ router.post('/books/categories', async (req, res) => {
             res.status(200).end(`New category: ${ctype}`);
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
