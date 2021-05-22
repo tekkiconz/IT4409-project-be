@@ -37,7 +37,9 @@ router.get('/books', async (req, res) => {
                     if (!data) {
                         res.status(404).json({ message:'books not found'});
                     } else {
-                        data.bookpath = `${host}/public/img_${data.id}`;
+                        // data is an array of book-info
+                        // data.bookpath = `${host}/public/books/book_${data.id}.pdf`;
+                        // data.prevpath = `${host}/public/book-previews/img_${data.id}${data.img_ext}`;
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
@@ -190,21 +192,32 @@ router.get('/books/categories', async (req, res) => {
 // ------------------- POST ---------------------------
 // POST /api/books
 router.post('/', async (req, res) => {
+    var bookFile    = req.files.bookfile;
+    var prevFile    = req.files.prevfile;
+    var exts        = prevFile.name.split('.');
+    var ext         = '.' + exts[exts.length - 1];
+    
     // get book's info
     var newBook = new Book({
-        bookname: req.body.bookname,
-        author: req.body.author,
-        description: req.body.description,
-        userid: req.body.userid,
-        category: req.body.category,
-        likesCount: 0
+        bookname    : req.body.bookname,
+        author      : req.body.author,
+        description : req.body.description,
+        userid      : req.body.userid,
+        category    : req.body.category,        
+        bookpath : `${host}/books/book_test.pdf`,
+        prevpath : `${host}/book-previews/img_test.png`,
+        likesCount  : 0
     });
+    
     var newActivity = new Activity({
-        bookid: newBook._id,
+        bookid  : newBook._id,
         bookname: newBook.bookname,
-        userid: req.body.userid,
-        nameact: 'Post Book'
+        userid  : req.body.userid,
+        nameact : 'Post Book'
     })
+
+    newBook.bookpath = `${host}/books/book_${newBook._id}.pdf`;
+    newBook.prevpath = `${host}/book-previews/img_${newBook.id}${ext}`;
 
     // save book's info
     await newBook.save((err, book) => {
@@ -212,33 +225,27 @@ router.post('/', async (req, res) => {
             console.log(`Error: ${err.message}`);
             res.status(400).json({message: `Error: ${err.message}`});
         }
-        //save activity
+        //save activity        
         try{
             newActivity.save();
         }
         catch(err){
             res.status(400).json({message: `Error: ${err.message}`});
         }
-        // save file to server        
-        var bookFile = req.files.bookfile;
-        var prevFile = req.files.prevfile;
-        var exts = prevFile.name.split('.');
-        var ext = '.' + exts[exts.length - 1];
-        var bookname = 'book_' + book.id + '.pdf';
-        var prevname = 'img_' + book.id + ext;
 
-        bookFile.mv(process.cwd() + '/public/books/' + bookname, error => {
+        // save file to server                        
+        bookFile.mv(process.cwd() + `/public/books/book_${book.id}.pdf`, error => {
+            if (error) {
+                res.status(400).json({message: `Error: ${err.message}`});
+            }
+
+        });
+        prevFile.mv(process.cwd() + `/public/book-previews/img_${book.id}${ext}`, error => {
             if (error) {
                 res.status(400).json({message: `Error: ${err.message}`});
             }
         });
-        prevFile.mv(process.cwd() + '/public/book-previews/' + prevname, error => {
-            if (error) {
-                res.status(400).json({message: `Error: ${err.message}`});
-            }
-        });
-        newBook.bookname = bookname;
-        newBook.previewname = prevname;
+
         res.status(200).json(newBook).end();
     });
 });
@@ -263,7 +270,6 @@ router.post('/:bookID/likes', auth, async (req, res) => {
     if (!book) {
         throw new Error()
     }
-
 
     await Like.findOne({ bookid: bid, userid: uid })
         .then(data => {
