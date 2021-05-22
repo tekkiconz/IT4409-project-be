@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const BOOKS_PER_PAGE = require('../helpers/configs').NUMBER_BOOK_PER_PAGE;
+const BOOKS_PER_PAGE = require('../helpers/configs').BOOKS_PER_PAGE;
+const COMMENTS_PER_PAGE = require('../helpers/configs').COMMENTS_PER_PAGE;
 const Book = require('../models/book');
 const Like = require('../models/like');
 const Comment = require('../models/comment');
@@ -16,7 +17,7 @@ const auth = require('./middleware/auth');
 
 // ------------------- GET ---------------------------
 // GET /api/books
-router.get('/books', async (req, res) => {
+router.get('/', async (req, res) => {
 
     // page start at index 0
     var page = req.query.page;
@@ -112,7 +113,7 @@ router.get('/books', async (req, res) => {
 });
 
 // GET /api/books/5
-router.get('/books/:bookID', async (req, res) => {
+router.get('/:bookID', async (req, res) => {
     var bid = req.params.bookID;
     console.log(bid);
     await Book.findOne({ _id: bid })
@@ -133,7 +134,7 @@ router.get('/books/:bookID', async (req, res) => {
 });
 
 // GET /api/books/5/likes
-router.get('/books/:bookID/likes', async (req, res) => {
+router.get('/:bookID/likes', async (req, res) => {
     var bid = req.params.bookID;
     await Book.findOne({ _id: bid })
         .then(data => {
@@ -153,8 +154,12 @@ router.get('/books/:bookID/likes', async (req, res) => {
 });
 
 // GET /api/books/5/comments
-router.get('/books/:bookID/comments', async (req, res) => {
+router.get('/:bookID/comments', async (req, res) => {
     var bid = req.params.bookID;
+    var page = req.query.page;
+
+    var start = page * COMMENTS_PER_PAGE;
+    var end = (page + 1) * COMMENTS_PER_PAGE;
 
     await Comment.find({ bookID: bid }).sort({ createAt: 1 })
         .then(data => {
@@ -165,7 +170,7 @@ router.get('/books/:bookID/comments', async (req, res) => {
                     .end();
             } else {
                 console.log('books:', data);
-                res.status(200).json(data).end();
+                res.status(200).json(data.slice(start, end)).end();
             }
         })
         .catch(err => {
@@ -175,7 +180,7 @@ router.get('/books/:bookID/comments', async (req, res) => {
 });
 
 // GET /api/books/categories
-router.get('/books/categories', async (req, res) => {
+router.get('/categories', async (req, res) => {
     await Category.find({})
         .then(data => {
             if (!data) {
@@ -191,7 +196,7 @@ router.get('/books/categories', async (req, res) => {
 
 // ------------------- POST ---------------------------
 // POST /api/books
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
     var bookFile    = req.files.bookfile;
     var prevFile    = req.files.prevfile;
     var exts        = prevFile.name.split('.');
@@ -202,10 +207,10 @@ router.post('/', async (req, res) => {
         bookname    : req.body.bookname,
         author      : req.body.author,
         description : req.body.description,
-        userid      : req.body.userid,
+        userid      : req.user._id,
         category    : req.body.category,        
-        bookpath : `${host}/books/book_test.pdf`,
-        prevpath : `${host}/book-previews/img_test.png`,
+        bookpath    : `${host}/books/book_test.pdf`,
+        prevpath    : `${host}/book-previews/img_test.png`,
         likesCount  : 0
     });
     
@@ -250,17 +255,17 @@ router.post('/', async (req, res) => {
     });
 });
 
-const fs = require('fs');
-// POST /api/books/images
-router.post('/images', async (req, res) => {
-    var Base64String = req.body.pdf;
-    var base64file = Base64String.split(';base64,').pop();
-    //console.log(base64Img);
-    fs.writeFile('book.pdf', base64file, {encoding: 'base64'}, function(err) {
-        console.log('File created');
-    });
-    res.end();
-})
+// const fs = require('fs');
+// // POST /api/books/images
+// router.post('/images', async (req, res) => {
+//     var Base64String = req.body.pdf;
+//     var base64file = Base64String.split(';base64,').pop();
+//     //console.log(base64Img);
+//     fs.writeFile('book.pdf', base64file, {encoding: 'base64'}, function(err) {
+//         console.log('File created');
+//     });
+//     res.end();
+// })
 
 // POST /api/books/5/likes
 router.post('/:bookID/likes', auth, async (req, res) => {
@@ -302,13 +307,13 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                             .catch(err => console.log(`Error: ${err.message}`));
                         
                         var b = new Book({
-                            _id: bid,
-                            bookname: bdata.bookname,
-                            author: bdata.author,
-                            description: bdata.description,
-                            userid: bdata.userid,
-                            category: bdata.category,
-                            likesCount: currLikeCount+1
+                            _id         : bid,
+                            bookname    : bdata.bookname,
+                            author      : bdata.author,
+                            description : bdata.description,
+                            userid      : bdata.userid,
+                            category    : bdata.category,
+                            likesCount  : currLikeCount + 1
                         })
                         console.log(b.likesCount)
                         Book.findOneAndUpdate({_id: bid}, b, {upsert: true}, function(err, doc) {
