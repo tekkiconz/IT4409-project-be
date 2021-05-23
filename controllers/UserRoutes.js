@@ -7,30 +7,29 @@ const auth = require('./middleware/auth');
 
 // POST /api/users/signup
 router.post('/signup', async (req, res) => {
-    var newUser = new User({
-        username: req.body.username,
-        password: req.body.password,
-        email: req.body.email
-    }).catch(err => console.log(err));
 
-    await User.findOne({ email: newUser.email })
+    await User.findOne({ email: req.body.email })
         .then(async profile => {
             if (!profile) {
-                await newUser
+                const newUser = await new User({
+                    username: req.body.username,
+                    password: req.body.password,
+                    email: req.body.email
+                })
                     .save()
                     .then(() => {
                         res.status(200).json(newUser).end();
                     })
                     .catch(err => {
-                        console.log("Error: ", err.message);
+                        res.status(400).json({ message: err })
                     });
             } else {
-                res.end("User already exists...");
+                res.status(409).json({ message: "User already exist" })
             }
         })
         .catch(err => {
             console.log("Error is", err.message);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({ message: `Error: ${err.message}` });
         });
 });
 
@@ -62,13 +61,13 @@ router.post('/login', async (req, res) => {
         })
         .catch(err => {
             console.log("Error is", err.message);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({ message: `Error: ${err.message}` });
         });
 });
 
 // GET /api/users/signout
 router.get('/signout', async (req, res) => {
-    res.clearCookie('userid').status(200).end("Cleared Cookie");
+    res.clearCookie('userid').status(200).json({ message: "Cookie Cleared" });
 });
 
 // GET /api/users/info
@@ -97,7 +96,7 @@ router.get('/currentuser', async (req, res) => {
     console.log("cookie:", req.headers.cookie);
     var cookie = req.headers.cookie;
     if (!cookie) {
-        res.status(404).json({ message: 'Current user is not set' });
+        res.status(200).json({});
     } else {
         var cookies = cookie.split('; ');
         var tmp = cookies[0];
@@ -109,7 +108,7 @@ router.get('/currentuser', async (req, res) => {
         await User.findOne({ _id: id })
             .then((profile) => {
                 if (!profile) {
-                    res.status(404).end(`Can't get current user's info`);
+                    res.status(401).json({ message: "Invalid token" });
                 } else {
                     res.status(200).json({
                         username: profile.username,
@@ -136,7 +135,7 @@ router.get('/history', auth, async (req, res) => {
         })
         .catch(err => {
             console.log(`Error: ${err.message}`)
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({ message: `Error: ${err.message}` });
         });
 });
 
