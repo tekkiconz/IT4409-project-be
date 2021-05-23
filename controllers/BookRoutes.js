@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const BOOKS_PER_PAGE = require('../helpers/configs').NUMBER_BOOK_PER_PAGE;
+const BOOKS_PER_PAGE = require('../helpers/configs').BOOKS_PER_PAGE;
+const COMMENTS_PER_PAGE = require('../helpers/configs').COMMENTS_PER_PAGE;
+const host = require('../helpers/configs').HOST;
 const Book = require('../models/book');
 const Like = require('../models/like');
 const Comment = require('../models/comment');
@@ -14,38 +16,47 @@ const auth = require('./middleware/auth');
 
 
 // ------------------- GET ---------------------------
-// GET /api/books
-router.get('/books', async (req, res) => {
+// GET /api/books?page=1&orderBy=bookname
+router.get('/', async (req, res) => {
 
     // page start at index 0
     var page = req.query.page;
     var ord = req.query.orderBy;
     var cat = req.query.category;
-
-    var start = page * BOOKS_PER_PAGE;
-    var end = (page + 1) * BOOKS_PER_PAGE;
+    var bid = req.query.bookid;
+    
+    if(page){
+        var start = page * BOOKS_PER_PAGE;
+        var end = (page + 1) * BOOKS_PER_PAGE;
+    } else { 
+        page = 0;
+    }
+    var queryObj = {};
+    if(cat) queryObj.category = cat;
+    else if(bid) queryObj._id = bid; 
 
     // Sort: 1 -> ASC
     //      -1 -> DESC
 
     switch (ord) {
-        case 'bookName':
-            await Book.find(cat ? { category: cat } : {})
-                .sort({ bookname: 1 })
+        case 'bookname':
+            await Book.find(queryObj)
+                .sort({ "bookname": 1 })
                 .then(data => {
                     if (!data) {
                         res.status(404).json({ message:'books not found'});
                     } else {
+                        // data is an array of book-info
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
+                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message :`Error: ${err.message}`});
                 });
             break;
         case 'author':
-            await Book.find(cat ? { category: cat } : {})
+            await Book.find(queryObj)
                 .sort({ author: 1 })
                 .then(data => {
                     if (!data) {
@@ -55,12 +66,12 @@ router.get('/books', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
+                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
         case 'category':
-            await Book.find(cat ? { category: cat } : {})
+            await Book.find(queryObj)
                 .sort({ category: 1 })
                 .then(data => {
                     if (!data) {
@@ -70,12 +81,12 @@ router.get('/books', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
+                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message :`Error: ${err.message}`});
                 });
             break;
         case 'userid':
-            await Book.find(cat ? { category: cat } : {})
+            await Book.find(queryObj)
                 .sort({ userid: 1 })
                 .then(data => {
                     if (!data) {
@@ -85,12 +96,12 @@ router.get('/books', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
+                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
         default: // sort by name
-            await Book.find(cat ? { category: cat } : {})
+            await Book.find(queryObj)
                 .sort({ bookname: 1 })
                 .then(data => {
                     if (!data) {
@@ -100,37 +111,16 @@ router.get('/books', async (req, res) => {
                     }
                 })
                 .catch(err => {
-                    console.log(`Error: ${err.message}`);
+                    // console.log(`Error: ${err.message}`);
                     res.status(400).json({message: `Error: ${err.message}`});
                 });
             break;
     }
 });
 
-// GET /api/books/5
-router.get('/books/:bookID', async (req, res) => {
-    var bid = req.params.bookID;
-    console.log(bid);
-    await Book.findOne({ _id: bid })
-        .then(data => {
-            if (!data) {
-                res
-                    .status(404)
-                    .json({ err: `Book (ID : ${bid}) not found` })
-                    .end();
-            } else {
-                res.status(200).json(data).end();
-            }
-        })
-        .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
-        });
-});
-
-// GET /api/books/5/likes
-router.get('/books/:bookID/likes', async (req, res) => {
-    var bid = req.params.bookID;
+// GET /api/books/5/likes?bookid=_
+router.get('/:bookid/likes', async (req, res) => {
+    var bid = req.params.bookid;
     await Book.findOne({ _id: bid })
         .then(data => {
             if (!data) {
@@ -143,14 +133,18 @@ router.get('/books/:bookID/likes', async (req, res) => {
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
+            // console.log(`Error: ${err.message}`);
             res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 
-// GET /api/books/5/comments
-router.get('/books/:bookID/comments', async (req, res) => {
-    var bid = req.params.bookID;
+// GET /api/books/5/comments?bookid=_&page=_
+router.get('/:bookid/comments', async (req, res) => {
+    var bid = req.params.bookid;
+    var page = req.query.page;
+
+    var start = page * COMMENTS_PER_PAGE;
+    var end = (page + 1) * COMMENTS_PER_PAGE;
 
     await Comment.find({ bookID: bid }).sort({ createAt: 1 })
         .then(data => {
@@ -160,24 +154,24 @@ router.get('/books/:bookID/comments', async (req, res) => {
                     .json({ err: 'Fail to get book comments' })
                     .end();
             } else {
-                console.log('books:', data);
-                res.status(200).json(data).end();
+                // console.log('books:', data);
+                res.status(200).json(data.slice(start, end));
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
+            // console.log(`Error: ${err.message}`);
             res.status(400).json({message: `Error: ${err.message}`});
         });
 });
 
 // GET /api/books/categories
-router.get('/books/categories', async (req, res) => {
-    await Category.find({})
+router.get('/categories', async (req, res) => {
+    await Category.find()
         .then(data => {
-            if (!data) {
+            if (JSON.stringify(data) == '[]') {
                 res.status(404).json({message: 'not found any categories'});
             }
-            res.status(200).json(data).end();
+            res.status(200).json(data);
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);
@@ -187,71 +181,82 @@ router.get('/books/categories', async (req, res) => {
 
 // ------------------- POST ---------------------------
 // POST /api/books
-router.post('/', async (req, res) => {
-    // get book's info
-    var newBook = new Book({
-        bookname: req.body.bookname,
-        author: req.body.author,
-        description: req.body.description,
-        userid: req.body.userid,
-        category: req.body.category,
-        likesCount: 0
-    });
-    var newActivity = new Activity({
-        bookid: newBook._id,
-        bookname: newBook.bookname,
-        userid: req.body.userid,
-        nameact: 'Post Book'
-    })
+router.post('/', auth, async (req, res) => {
+    var bookFile    = req.files.bookfile;
+    var prevFile    = req.files.prevfile;
+    if(bookFile == null || prevFile == null){
+        res.status(400).json({message: 'Not found bookfile or frevfile'})
+    }
+    else{
+        var exts        = prevFile.name.split('.');
+        var ext         = '.' + exts[exts.length - 1];
+        
+        // get book's info
+        var newBook = new Book({
+            bookname    : req.body.bookname,
+            author      : req.body.author,
+            description : req.body.description,
+            userid      : req.user._id,
+            category    : req.body.category,
+            likesCount  : 0,
+            bookpath    : `${host}/books/book_test.pdf`,
+            prevpath    : `${host}/book-previews/img_test.png`,
+        });
+        
+        var newActivity = new Activity({
+            bookid  : newBook._id,
+            bookname: newBook.bookname,
+            userid  : req.user._id,
+            nameact : 'Post Book'
+        })
 
-    // save book's info
-    await newBook.save((err, book) => {
-        if (err) {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
-        }
-        //save activity
-        try{
-            newActivity.save();
-        }
-        catch(err){
-            res.status(400).json({message: `Error: ${err.message}`});
-        }
-        // save file to server        
-        var bookFile = req.files.bookfile;
-        var prevFile = req.files.prevfile;
-        var exts = prevFile.name.split('.');
-        var ext = '.' + exts[exts.length - 1];
-        var bookname = 'book_' + book.id + '.pdf';
-        var prevname = 'img_' + book.id + ext;
+        newBook.bookpath = `${host}/books/book_${newBook._id}.pdf`;
+        newBook.prevpath = `${host}/book-previews/img_${newBook.id}${ext}`;
 
-        bookFile.mv(process.cwd() + '/public/books/' + bookname, error => {
-            if (error) {
-                res.status(400).json({message: `Error: ${err.message}`});
+        // save book's info
+        await newBook.save((err, book) => {
+            if (err) {
+                res.status(400).json({message :`Error: ${err.message}`});//gui response ve
+            }
+            else{
+                //save activity        
+                try{
+                    newActivity.save();
+                }
+                catch(err){
+                    res.status(400).json({message: `Error: ${err.message}`});
+                }
+
+                // save file to server                        
+                bookFile.mv(process.cwd() + `/public/books/book_${book.id}.pdf`, error => {
+                    if (error) {
+                        res.status(400).json({message: `Error: ${err.message}`});
+                    }
+
+                });
+                prevFile.mv(process.cwd() + `/public/book-previews/img_${book.id}${ext}`, error => {
+                    if (error) {
+                        res.status(400).json({message: `Error: ${err.message}`});
+                    }
+                });
+
+                res.status(200).json(newBook);
             }
         });
-        prevFile.mv(process.cwd() + '/public/book-previews/' + prevname, error => {
-            if (error) {
-                res.status(400).json({message: `Error: ${err.message}`});
-            }
-        });
-        newBook.bookname = bookname;
-        newBook.previewname = prevname;
-        res.status(200).json(newBook).end();
-    });
+    }
 });
 
-const fs = require('fs');
-// POST /api/books/images
-router.post('/images', async (req, res) => {
-    var Base64String = req.body.pdf;
-    var base64file = Base64String.split(';base64,').pop();
-    //console.log(base64Img);
-    fs.writeFile('book.pdf', base64file, {encoding: 'base64'}, function(err) {
-        console.log('File created');
-    });
-    res.end();
-})
+// const fs = require('fs');
+// // POST /api/books/images
+// router.post('/images', async (req, res) => {
+//     var Base64String = req.body.pdf;
+//     var base64file = Base64String.split(';base64,').pop();
+//     //console.log(base64Img);
+//     fs.writeFile('book.pdf', base64file, {encoding: 'base64'}, function(err) {
+//         console.log('File created');
+//     });
+//     res.end();
+// })
 
 // POST /api/books/5/likes
 router.post('/:bookID/likes', auth, async (req, res) => {
@@ -261,7 +266,6 @@ router.post('/:bookID/likes', auth, async (req, res) => {
     if (!book) {
         throw new Error()
     }
-
 
     await Like.findOne({ bookid: bid, userid: uid })
         .then(data => {
@@ -294,13 +298,13 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                             .catch(err => console.log(`Error: ${err.message}`));
                         
                         var b = new Book({
-                            _id: bid,
-                            bookname: bdata.bookname,
-                            author: bdata.author,
-                            description: bdata.description,
-                            userid: bdata.userid,
-                            category: bdata.category,
-                            likesCount: currLikeCount+1
+                            _id         : bid,
+                            bookname    : bdata.bookname,
+                            author      : bdata.author,
+                            description : bdata.description,
+                            userid      : bdata.userid,
+                            category    : bdata.category,
+                            likesCount  : currLikeCount + 1
                         })
                         console.log(b.likesCount)
                         Book.findOneAndUpdate({_id: bid}, b, {upsert: true}, function(err, doc) {
@@ -310,14 +314,12 @@ router.post('/:bookID/likes', auth, async (req, res) => {
 
                     })
                     .catch(err => {
-                        console.log(`Error: ${err.message}`);
-                        res.status(400).json({message: `Error: ${err.message}`});
+                        res.status(400).json({message :`Error: ${err.message}`});//in ra
                     });
             }
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//in ra
         });
 });
 
@@ -337,33 +339,33 @@ router.post('/:bookID/comments', auth, async (req, res) => {
     await newCmt.save()
         .then(() => {
             res.status(200).end(`New comment on book ${bid}`);
+            //save activity
             try{
                 newActivity.save();
             }
             catch(err){
                 res.status(400).json({message: `Error: ${err.message}`});
             }
-            console.log(newActivity)
+            // console.log(newActivity)
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 
 // POST /api/books/categories
-router.post('/books/categories', async (req, res) => {
+router.post('/categories', async (req, res) => {
     var ctype = req.body.type;
+    // console.log(ctype)
     var newCat = new Category({
-        type: ctype
+        name: ctype
     });
     await newCat.save()
         .then(() => {
             res.status(200).end(`New category: ${ctype}`);
         })
         .catch(err => {
-            console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
         });
 });
 

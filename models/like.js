@@ -8,6 +8,6 @@ const LikeSchema = new mongoose.Schema(
 	{ collection: 'likes' }
 )
 
-const likeModel = mongoose.model('LikeSchema', LikeSchema)
+const likeModel = mongoose.model('likes', LikeSchema)
 
 module.exports = likeModel
