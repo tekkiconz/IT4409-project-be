@@ -24,16 +24,16 @@ router.get('/', async (req, res) => {
     var ord = req.query.orderBy;
     var cat = req.query.category;
     var bid = req.query.bookid;
-    
-    if(page){
+
+    if (page) {
         var start = page * BOOKS_PER_PAGE;
         var end = (page + 1) * BOOKS_PER_PAGE;
-    } else { 
+    } else {
         page = 0;
     }
     var queryObj = {};
-    if(cat) queryObj.category = cat;
-    else if(bid) queryObj._id = bid; 
+    if (cat) queryObj.category = cat;
+    else if (bid) queryObj._id = bid;
 
     // Sort: 1 -> ASC
     //      -1 -> DESC
@@ -44,7 +44,7 @@ router.get('/', async (req, res) => {
                 .sort({ "bookname": 1 })
                 .then(data => {
                     if (!data) {
-                        res.status(404).json({ message:'books not found'});
+                        res.status(404).json({ message: 'books not found' });
                     } else {
                         // data is an array of book-info
                         res.status(200).json(data.slice(start, end)).end();
@@ -52,7 +52,7 @@ router.get('/', async (req, res) => {
                 })
                 .catch(err => {
                     // console.log(`Error: ${err.message}`);
-                    res.status(400).json({message :`Error: ${err.message}`});
+                    res.status(400).json({ message: `Error: ${err.message}` });
                 });
             break;
         case 'author':
@@ -60,14 +60,14 @@ router.get('/', async (req, res) => {
                 .sort({ author: 1 })
                 .then(data => {
                     if (!data) {
-                        res.status(404).json({message:'books not found'});
+                        res.status(404).json({ message: 'books not found' });
                     } else {
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
                     // console.log(`Error: ${err.message}`);
-                    res.status(400).json({message: `Error: ${err.message}`});
+                    res.status(400).json({ message: `Error: ${err.message}` });
                 });
             break;
         case 'category':
@@ -75,14 +75,14 @@ router.get('/', async (req, res) => {
                 .sort({ category: 1 })
                 .then(data => {
                     if (!data) {
-                        res.status(404).json({message: 'books not found'});
+                        res.status(404).json({ message: 'books not found' });
                     } else {
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
                     // console.log(`Error: ${err.message}`);
-                    res.status(400).json({message :`Error: ${err.message}`});
+                    res.status(400).json({ message: `Error: ${err.message}` });
                 });
             break;
         case 'userid':
@@ -90,14 +90,14 @@ router.get('/', async (req, res) => {
                 .sort({ userid: 1 })
                 .then(data => {
                     if (!data) {
-                        res.status(404).json({message: 'books not found'});
+                        res.status(404).json({ message: 'books not found' });
                     } else {
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
                     // console.log(`Error: ${err.message}`);
-                    res.status(400).json({message: `Error: ${err.message}`});
+                    res.status(400).json({ message: `Error: ${err.message}` });
                 });
             break;
         default: // sort by name
@@ -105,14 +105,14 @@ router.get('/', async (req, res) => {
                 .sort({ bookname: 1 })
                 .then(data => {
                     if (!data) {
-                        res.status(404).json({message: 'books not found'});
+                        res.status(404).json({ message: 'books not found' });
                     } else {
                         res.status(200).json(data.slice(start, end)).end();
                     }
                 })
                 .catch(err => {
                     // console.log(`Error: ${err.message}`);
-                    res.status(400).json({message: `Error: ${err.message}`});
+                    res.status(400).json({ message: `Error: ${err.message}` });
                 });
             break;
     }
@@ -134,7 +134,7 @@ router.get('/:bookid/likes', async (req, res) => {
         })
         .catch(err => {
             // console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({ message: `Error: ${err.message}` });
         });
 });
 
@@ -160,7 +160,7 @@ router.get('/:bookid/comments', async (req, res) => {
         })
         .catch(err => {
             // console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({ message: `Error: ${err.message}` });
         });
 });
 
@@ -169,45 +169,48 @@ router.get('/categories', async (req, res) => {
     await Category.find()
         .then(data => {
             if (JSON.stringify(data) == '[]') {
-                res.status(404).json({message: 'not found any categories'});
+                res.status(404).json({ message: 'not found any categories' });
             }
             res.status(200).json(data);
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);
-            res.status(400).json({message: `Error: ${err.message}`});
+            res.status(400).json({ message: `Error: ${err.message}` });
         });
 });
 
 // ------------------- POST ---------------------------
 // POST /api/books
 router.post('/', auth, async (req, res) => {
-    var bookFile    = req.files.bookfile;
-    var prevFile    = req.files.prevfile;
-    if(bookFile == null || prevFile == null){
-        res.status(400).json({message: 'Not found bookfile or frevfile'})
+    console.log(req.files)
+    var bookFile = req.files.bookfile;
+    var prevFile = req.files.prevfile;
+    console.log(bookFile);
+    if (bookFile == null || prevFile == null) {
+        console.log("haha")
+        res.status(400).json({ message: 'Not found bookfile or frevfile' })
     }
-    else{
-        var exts        = prevFile.name.split('.');
-        var ext         = '.' + exts[exts.length - 1];
-        
+    else {
+        var exts = prevFile.name.split('.');
+        var ext = '.' + exts[exts.length - 1];
+
         // get book's info
         var newBook = new Book({
-            bookname    : req.body.bookname,
-            author      : req.body.author,
-            description : req.body.description,
-            userid      : req.user._id,
-            category    : req.body.category,
-            likesCount  : 0,
-            bookpath    : `${host}/books/book_test.pdf`,
-            prevpath    : `${host}/book-previews/img_test.png`,
+            bookname: req.body.bookname,
+            author: req.body.author,
+            description: req.body.description,
+            userid: req.user._id,
+            category: req.body.category,
+            likesCount: 0,
+            bookpath: `${host}/books/book_test.pdf`,
+            prevpath: `${host}/book-previews/img_test.png`,
         });
-        
+
         var newActivity = new Activity({
-            bookid  : newBook._id,
+            bookid: newBook._id,
             bookname: newBook.bookname,
-            userid  : req.user._id,
-            nameact : 'Post Book'
+            userid: req.user._id,
+            nameact: 'Post Book'
         })
 
         newBook.bookpath = `${host}/books/book_${newBook._id}.pdf`;
@@ -216,27 +219,28 @@ router.post('/', auth, async (req, res) => {
         // save book's info
         await newBook.save((err, book) => {
             if (err) {
-                res.status(400).json({message :`Error: ${err.message}`});//gui response ve
+                console.log(err)
+                res.status(400).json({ message: `Error: ${err.message}` });//gui response ve
             }
-            else{
+            else {
                 //save activity        
-                try{
+                try {
                     newActivity.save();
                 }
-                catch(err){
-                    res.status(400).json({message: `Error: ${err.message}`});
+                catch (err) {
+                    res.status(400).json({ message: `Error: ${err.message}` });
                 }
 
                 // save file to server                        
                 bookFile.mv(process.cwd() + `/public/books/book_${book.id}.pdf`, error => {
                     if (error) {
-                        res.status(400).json({message: `Error: ${err.message}`});
+                        res.status(400).json({ message: `Error: ${err.message}` });
                     }
 
                 });
                 prevFile.mv(process.cwd() + `/public/book-previews/img_${book.id}${ext}`, error => {
                     if (error) {
-                        res.status(400).json({message: `Error: ${err.message}`});
+                        res.status(400).json({ message: `Error: ${err.message}` });
                     }
                 });
 
@@ -270,7 +274,7 @@ router.post('/:bookID/likes', auth, async (req, res) => {
     await Like.findOne({ bookid: bid, userid: uid })
         .then(data => {
             if (data) {
-                res.status(403).json({message: `User ${uid} liked book ${bid}`});
+                res.status(403).json({ message: `User ${uid} liked book ${bid}` });
             } else {
                 Book.findOne({ _id: bid })
                     .then(bdata => {
@@ -279,11 +283,11 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                             userid: req.user._id,
                             nameact: 'Like'
                         })
-                        try{
+                        try {
                             newActivity.save();
                         }
-                        catch(err){
-                            res.status(400).json({message: `Error: ${err.message}`});
+                        catch (err) {
+                            res.status(400).json({ message: `Error: ${err.message}` });
                         }
                         let currLikeCount = bdata.likesCount;
                         let newLike = new Like({
@@ -296,30 +300,30 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                                 console.log(`User ${uid} has liked book ${bid}`);
                             })
                             .catch(err => console.log(`Error: ${err.message}`));
-                        
+
                         var b = new Book({
-                            _id         : bid,
-                            bookname    : bdata.bookname,
-                            author      : bdata.author,
-                            description : bdata.description,
-                            userid      : bdata.userid,
-                            category    : bdata.category,
-                            likesCount  : currLikeCount + 1
+                            _id: bid,
+                            bookname: bdata.bookname,
+                            author: bdata.author,
+                            description: bdata.description,
+                            userid: bdata.userid,
+                            category: bdata.category,
+                            likesCount: currLikeCount + 1
                         })
                         console.log(b.likesCount)
-                        Book.findOneAndUpdate({_id: bid}, b, {upsert: true}, function(err, doc) {
+                        Book.findOneAndUpdate({ _id: bid }, b, { upsert: true }, function (err, doc) {
                             if (err) console.log(err)
                         });
                         res.status(200).end('Increase likeCounts')
 
                     })
                     .catch(err => {
-                        res.status(400).json({message :`Error: ${err.message}`});//in ra
+                        res.status(400).json({ message: `Error: ${err.message}` });//in ra
                     });
             }
         })
         .catch(err => {
-            res.status(400).json({message :`Error: ${err.message}`});//in ra
+            res.status(400).json({ message: `Error: ${err.message}` });//in ra
         });
 });
 
@@ -340,16 +344,16 @@ router.post('/:bookID/comments', auth, async (req, res) => {
         .then(() => {
             res.status(200).end(`New comment on book ${bid}`);
             //save activity
-            try{
+            try {
                 newActivity.save();
             }
-            catch(err){
-                res.status(400).json({message: `Error: ${err.message}`});
+            catch (err) {
+                res.status(400).json({ message: `Error: ${err.message}` });
             }
             // console.log(newActivity)
         })
         .catch(err => {
-            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
+            res.status(400).json({ message: `Error: ${err.message}` });//gui response ve
         });
 });
 
@@ -365,7 +369,7 @@ router.post('/categories', async (req, res) => {
             res.status(200).end(`New category: ${ctype}`);
         })
         .catch(err => {
-            res.status(400).json({message :`Error: ${err.message}`});//gui response ve
+            res.status(400).json({ message: `Error: ${err.message}` });//gui response ve
         });
 });
 
