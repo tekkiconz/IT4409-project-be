@@ -75,7 +75,7 @@ router.get('/signout', async (req, res) => {
 
 // GET /api/users/info
 router.get('/info', async (req, res) => {
-    var uid = req.body.id;
+    var uid = req.query.id;
     console.log(uid);
     await User.findOne({ _id: uid })
         .then((profile) => {
@@ -89,10 +89,6 @@ router.get('/info', async (req, res) => {
             }
         });
 });
-
-router.get('/me', auth, async (req, res) => {
-    res.send(req.user)
-})
 
 // GET /api/users/currentuser
 router.get('/currentuser', async (req, res) => {
