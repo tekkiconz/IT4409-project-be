@@ -118,13 +118,11 @@ router.get('/', async (req, res) => {
 router.get('/:bookid/likes', auth, async (req, res) => {
     var bid = req.params.bookid;
     var uid = req.user._id;
-
-    await Like.findOne({ bookid: bid, userid : uid})
+    await Like.findOne({ bookid: bid, userid: uid })
         .then(data => {
             if (!data) {
-                res
-                    .status(200)
-                    .json({ status : false })
+                res.status(200)
+                    .json({ status: false })
                     .end();
             } else {
                 res.status(200).json({ status: true }).end();
@@ -134,6 +132,7 @@ router.get('/:bookid/likes', auth, async (req, res) => {
             res.status(400).json({ message: `Error: ${err.message}` });
         });
 });
+
 
 // GET /api/books/5/comments?bookid=_&page=_
 router.get('/:bookid/comments', async (req, res) => {
