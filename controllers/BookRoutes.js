@@ -278,54 +278,67 @@ router.post('/:bookID/likes', auth, async (req, res) => {
 
     await Like.findOne({ bookid: bid, userid: uid })
         .then(data => {
+            var increase = 1;
             if (data) {
-                res.status(403).json({ message: `User ${uid} liked book ${bid}` });
-            } else {
-                Book.findOne({ _id: bid })
-                    .then(bdata => {
-                        var newActivity = new Activity({
-                            bookid: bid,
-                            userid: req.user._id,
-                            nameact: 'Like'
-                        })
-                        try {
-                            newActivity.save();
-                        }
-                        catch (err) {
-                            res.status(400).json({ message: `Error: ${err.message}` });
-                        }
-                        let currLikeCount = bdata.likesCount;
-                        let newLike = new Like({
-                            userid: uid,
-                            bookid: bid
-                        });
 
-                        newLike.save()
-                            .then(() => {
-                                console.log(`User ${uid} has liked book ${bid}`);
-                            })
-                            .catch(err => console.log(`Error: ${err.message}`));
-
-                        var b = new Book({
-                            _id: bid,
-                            bookname: bdata.bookname,
-                            author: bdata.author,
-                            description: bdata.description,
-                            userid: bdata.userid,
-                            category: bdata.category,
-                            likesCount: currLikeCount + 1
-                        })
-                        console.log(b.likesCount)
-                        Book.findOneAndUpdate({ _id: bid }, b, { upsert: true }, function (err, doc) {
-                            if (err) console.log(err)
-                        });
-                        res.status(200).end('Increase likeCounts')
-
+                console.log(bid, uid);
+                Like.findOneAndDelete({ bookid: bid, userid: uid })
+                    .then((data) => {
+                        console.log(data);
                     })
-                    .catch(err => {
-                        res.status(400).json({ message: `Error: ${err.message}` });
-                    });
+                    .catch(err => res.status(400).json({ message: err.message }));
+
+                increase = -1;
+            } else {
+                let newLike = new Like({
+                    userid: uid,
+                    bookid: bid
+                });
+
+                newLike.save()
+                    .then(() => {
+                        console.log(`User ${uid} has ${(increase == 1) ? 'liked' : 'un-liked'} book ${bid}`);
+                    })
+                    .catch(err => res.status(400).json({ message: err.message }));
+
+                increase = 1;
             }
+
+            Book.findOne({ _id: bid })
+                .then(bdata => {
+                    var newActivity = new Activity({
+                        bookid: bid,
+                        userid: req.user._id,
+                        nameact: (increase == 1) ? 'Like' : 'Unlike'
+                    })
+                    try {
+                        newActivity.save();
+                    }
+                    catch (err) {
+                        res.status(400).json({ message: `Error: ${err.message}` });
+                    }
+                    let currLikeCount = bdata.likesCount;
+
+                    var b = new Book({
+                        _id: bid,
+                        bookname: bdata.bookname,
+                        author: bdata.author,
+                        description: bdata.description,
+                        userid: bdata.userid,
+                        category: bdata.category,
+                        likesCount: currLikeCount + increase
+                    })
+                    console.log(b.likesCount)
+
+                    Book.findOneAndUpdate({ _id: bid }, b, { upsert: true }, function (err, doc) {
+                        if (err) console.log(err)
+                    });
+                    res.status(200).end(`${(increase == 1) ? 'Increased' : 'Decreased'} likeCounts`);
+
+                })
+                .catch(err => {
+                    res.status(400).json({ message: `Error: ${err.message}` });
+                });
         })
         .catch(err => {
             res.status(400).json({ message: `Error: ${err.message}` });
