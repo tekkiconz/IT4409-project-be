@@ -123,7 +123,7 @@ router.get('/:bookid/likes', auth, async (req, res) => {
         .then(data => {
             if (!data) {
                 res
-                    .status(400)
+                    .status(200)
                     .json({ status : false })
                     .end();
             } else {
