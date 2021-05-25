@@ -137,11 +137,11 @@ router.get('/:bookid/likes', async (req, res) => {
 router.get('/:bookid/comments', async (req, res) => {
     var bid = req.params.bookid;
     var page = req.query.page;
-
+    console.log(bid, page);
     var start = (page - 1) * COMMENTS_PER_PAGE;
     var end = page * COMMENTS_PER_PAGE;
 
-    await Comment.find({ bookID: bid }).sort({ createAt: 1 })
+    await Comment.find({ bookid: bid }).sort({ createAt: 1 })
         .then(data => {
             if (!data) {
                 res
@@ -149,6 +149,7 @@ router.get('/:bookid/comments', async (req, res) => {
                     .json({ err: 'Fail to get book comments' })
                     .end();
             } else {
+                console.log(data)
                 res.status(200).json(data.slice(start, end));
             }
         })
@@ -348,7 +349,7 @@ router.post('/:bookID/comments', auth, async (req, res) => {
     })
     await newCmt.save()
         .then(() => {
-            res.status(200).end(`New comment on book ${bid}`);
+            res.status(200).json({ message: `New comment on book ${bid}` });
             //save activity
             try {
                 newActivity.save();
