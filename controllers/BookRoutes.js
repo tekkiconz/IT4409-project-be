@@ -117,15 +117,17 @@ router.get('/', async (req, res) => {
 // GET /api/books/5/likes?bookid=_
 router.get('/:bookid/likes', async (req, res) => {
     var bid = req.params.bookid;
-    await Book.findOne({ _id: bid })
+    var uid = req.user._id;
+
+    await Like.findOne({ bookid: bid, userid : uid})
         .then(data => {
             if (!data) {
                 res
                     .status(400)
-                    .json({ err: 'Fail to get book likesCount' })
+                    .json({ status : false })
                     .end();
             } else {
-                res.status(200).json({ likes: data.likesCount }).end();
+                res.status(200).json({ status: true }).end();
             }
         })
         .catch(err => {
