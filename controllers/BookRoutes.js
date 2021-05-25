@@ -118,10 +118,12 @@ router.get('/', async (req, res) => {
 router.get('/:bookid/likes', auth, async (req, res) => {
     var bid = req.params.bookid;
     var uid = req.user._id;
+
     await Like.findOne({ bookid: bid, userid: uid })
         .then(data => {
             if (!data) {
-                res.status(200)
+                res
+                    .status(200)
                     .json({ status: false })
                     .end();
             } else {
@@ -170,6 +172,22 @@ router.get('/categories', async (req, res) => {
         })
         .catch(err => {
             console.log(`Error: ${err.message}`);
+            res.status(400).json({ message: `Error: ${err.message}` });
+        });
+});
+
+// GET /api/books/featuredbooks
+router.get('/featuredbooks', async (req, res) => {
+    await Book.find({})
+        .sort({ 'likesCount': -1, 'createdAt': -1 })
+        .then(data => {
+            if (!data) {
+                res.status(404).json({ message: 'Featured books not found' });
+            } else {
+                res.status(200).json(data.slice(0, 3)).end();
+            }
+        })
+        .catch(err => {
             res.status(400).json({ message: `Error: ${err.message}` });
         });
 });
