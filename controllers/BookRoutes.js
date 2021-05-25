@@ -141,7 +141,7 @@ router.get('/:bookid/comments', async (req, res) => {
     var start = (page - 1) * COMMENTS_PER_PAGE;
     var end = page * COMMENTS_PER_PAGE;
 
-    await Comment.find({ bookid: bid }).sort({ createAt: 1 })
+    await Comment.find({ bookid: bid }).sort({ createdAt: -1 })
         .then(data => {
             if (!data) {
                 res
@@ -334,7 +334,7 @@ router.post('/:bookID/likes', auth, async (req, res) => {
                     Book.findOneAndUpdate({ _id: bid }, b, { upsert: true }, function (err, doc) {
                         if (err) console.log(err)
                     });
-                    res.status(200).end(`${(increase == 1) ? 'Increased' : 'Decreased'} likeCounts`);
+                    res.status(200).json({ message: `${(increase == 1) ? 'Increased' : 'Decreased'} likeCounts` });
 
                 })
                 .catch(err => {
@@ -386,7 +386,7 @@ router.post('/categories', async (req, res) => {
     });
     await newCat.save()
         .then(() => {
-            res.status(200).end(`New category: ${ctype}`);
+            res.status(200).json({ message: `New category: ${ctype}` });
         })
         .catch(err => {
             res.status(400).json({ message: `Error: ${err.message}` });
