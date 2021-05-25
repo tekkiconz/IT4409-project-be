@@ -115,7 +115,7 @@ router.get('/', async (req, res) => {
 });
 
 // GET /api/books/5/likes?bookid=_
-router.get('/:bookid/likes', async (req, res) => {
+router.get('/:bookid/likes', auth, async (req, res) => {
     var bid = req.params.bookid;
     var uid = req.user._id;
 
