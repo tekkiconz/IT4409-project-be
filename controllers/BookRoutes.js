@@ -23,6 +23,7 @@ router.get('/', async (req, res) => {
     var ord = req.query.orderBy;
     var cat = req.query.category;
     var bid = req.query.bookid;
+    var key = req.query.searchKey;
 
     // page start at 1
     if (!page) {
@@ -34,7 +35,8 @@ router.get('/', async (req, res) => {
     var queryObj = {};
 
     if (cat) queryObj.category = cat;
-    else if (bid) queryObj._id = bid;
+    if (bid) queryObj._id = bid;
+    if(key) queryObj.bookname = key;
 
     // Sort: 1 -> ASC
     //      -1 -> DESC
