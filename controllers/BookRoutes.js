@@ -99,7 +99,7 @@ router.get('/', async (req, res) => {
             break;
         default: // sort by name
             await Book.find(queryObj)
-                .sort({ bookname: 1 })
+                .sort({ createdAt: -1 })
                 .then(data => {
                     if (!data) {
                         res.status(404).json({ message: 'books not found' });
