@@ -19,6 +19,7 @@ const auth = require('./middleware/auth');
 // GET /api/books?page=1&orderBy=bookname
 router.get('/', async (req, res) => {
     // page start at index 0
+    console.log(req.query)
     var page = req.query.page;
     var ord = req.query.orderBy;
     var cat = req.query.category;
@@ -34,12 +35,9 @@ router.get('/', async (req, res) => {
     var end = page * BOOKS_PER_PAGE;
     var queryObj = {};
 
-    if (cat) queryObj.category = cat;
+    if (cat && cat !== 'null') queryObj.category = cat;
     if (bid) queryObj._id = bid;
-    if(key) queryObj.bookname = key;
-
-    // Sort: 1 -> ASC
-    //      -1 -> DESC
+    if (key) queryObj.bookname = new RegExp(key, 'i')
 
     switch (ord) {
         case 'bookname':
@@ -110,6 +108,7 @@ router.get('/', async (req, res) => {
                     }
                 })
                 .catch(err => {
+                    console.log(err)
                     res.status(400).json({ message: `Error: ${err.message}` });
                 });
             break;

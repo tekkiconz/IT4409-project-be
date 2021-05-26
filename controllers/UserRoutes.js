@@ -7,15 +7,16 @@ const auth = require('./middleware/auth');
 
 // POST /api/users/signup
 router.post('/signup', async (req, res) => {
+    const newUser = await new User({
+        username: req.body.username,
+        password: req.body.password,
+        email: req.body.email
+    })
 
     await User.findOne({ email: req.body.email })
         .then(async profile => {
             if (!profile) {
-                const newUser = await new User({
-                    username: req.body.username,
-                    password: req.body.password,
-                    email: req.body.email
-                })
+                newUser
                     .save()
                     .then(() => {
                         var id = newUser.id
